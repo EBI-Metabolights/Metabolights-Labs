@@ -1,0 +1,65 @@
+.div-wrapper{
+	display: flex;
+	align-items: center;
+  	justify-content: center;
+	min-height: 50vh;
+	padding: 40px 40px;
+	flex-direction: column;
+	text-align: center;
+}
+
+.vh80{
+	min-height: 80vh !important;
+}
+
+.div-wrapper .spinner > h5{
+	font-weight: normal;
+	letter-spacing: 1px;
+}
+
+.div-wrapper .spinner > small{
+	font-weight: lighter;
+}
+
+.spinner{
+	position: relative !important;
+    top: 0%;
+    left: 0%;
+    margin-top: 0px; 
+    margin-left: 0px;
+    text-align: center;
+}
+
+ul {
+  list-style-type: none;
+}
+
+ul li{
+  padding: 5px 0;
+}
+
+.npt{
+	padding-top: 0;
+}
+
+.npl{
+	padding-left: 5px;
+}
+
+.logFileData{
+	overflow-x: scroll;
+}
+
+.jcc{
+    justify-content: center !important;
+}
+
+.section-title{
+	float: right;
+	font-size: 0.6em;
+	color: #d8d8d8;
+	margin-right: 5px;
+	border: 1px solid #d8d8d8;
+	border-radius: 2px;
+	padding: 2px 4px;
+}

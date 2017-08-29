@@ -1,0 +1,7 @@
+.main-container{
+    min-height: 100vh - 60px;
+    margin: 50px 0 0 225px;
+    -ms-overflow-x: hidden;
+        overflow-x: hidden;
+    position: relative;
+}

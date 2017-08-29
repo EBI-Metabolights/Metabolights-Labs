@@ -1,0 +1,47 @@
+<div class="content row">
+	<div class="col-md-9 mini-wrapper">
+		<div class="section">
+			<h3 class="title">Settings</h3>
+		</div>
+		<div class="col-xs-12 col-sm-6">
+			<div class="list-group">
+			  <a class="list-group-item list-group-item-action flex-column align-items-start">
+			    <div class="d-flex w-100 justify-content-between">
+			      <small>First Name</small>
+			      <h5 class="mb-1">{{ user.firstName }}</h5>
+			    </div>
+			  </a>
+			  <a class="list-group-item list-group-item-action flex-column align-items-start">
+			    <div class="d-flex w-100 justify-content-between">
+			      <small>Last Name</small>
+			      <h5 class="mb-1">{{ user.lastName }}</h5>
+			    </div>
+			  </a>
+			  <a class="list-group-item list-group-item-action flex-column align-items-start">
+			    <div class="d-flex w-100 justify-content-between">
+			      <small>Email</small>
+			      <h5 class="mb-1">{{ user.email }}</h5>
+			    </div>
+			  </a>
+			  <a class="list-group-item list-group-item-action flex-column align-items-start">
+			    <div class="d-flex w-100 justify-content-between">
+			      <small>Address</small>
+			      <h5 class="mb-1">{{ user.address }}</h5>
+			    </div>
+			  </a>
+			  <a class="list-group-item list-group-item-action flex-column align-items-start">
+			    <div class="d-flex w-100 justify-content-between">
+			      <small>Affiliation</small>
+			      <h5 class="mb-1">{{ user.affiliation }}</h5>
+			    </div>
+			  </a>
+			  <a class="list-group-item list-group-item-action flex-column align-items-start">
+			    <div class="d-flex w-100 justify-content-between">
+			      <small>ORCID Id</small>
+			      <h5 class="mb-1">{{user.orcid ? user.orcid : '-'}}</h5>
+			    </div>
+			  </a>
+			</div>
+		</div>
+	</div>
+</div>        

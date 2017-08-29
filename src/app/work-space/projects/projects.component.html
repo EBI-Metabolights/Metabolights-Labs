@@ -1,0 +1,168 @@
+<div class="content row">
+	<div class="col-md-9 mini-wrapper">
+		<div class="section">
+			<h3 class="title"><i class="fa fa-cubes"></i> Projects</h3>
+		</div>
+		<div class=" section ntp" *ngIf="projects.length > 0">
+			<div class="row">
+				<div *ngFor="let project of projects">
+					<div class="col-3" [class.selectedProject]="project.id === selectedProject.id" class="p-wrapper"  (dblclick)="onSelect(project)" (click)="setSelected(project)">
+						<div>
+							<h1><i class="fa fa-folder-o fa-2x"></i></h1>
+							<h5><a>{{ project.title }}</a></h5>
+							<h6 class="md">
+								<small class="tiny">
+									<span class="pull-left">
+										<i class="fa fa-info-circle"></i>&nbsp;{{ getId(project.id) }}
+									</span>
+									<span class="pull-right">
+										<span *ngIf="project.isBusy == true">
+											<i class="fa fa-lock fa-2x"></i>
+										</span>
+									</span>
+								</small>
+							</h6>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div *ngIf="projects.length == 0">
+			<div class="cloning_project">
+				<img src="assets/img/start.png" height="128" class="logo"><br>
+				<div class="spinner">
+					<h6 class="text-center">
+						No projects found! Create a new project to get started? 
+					</h6><br>
+					<small class="center"><i><a href="http://www.ebi.ac.uk/metabolights/contact" target="_blank" class="btn btn-sm btn-primary">Need Help</a></i></small>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-xs-12 col-md-3 grey np">
+		<div class="section">
+			<!-- 
+				<span class="right">
+		  			<label>Manage Projects</label>
+		  		</span> 
+		  	-->
+		  	<span class="form-group">
+		  		<button (click)="open(content)" class="btn btn-success btn-sm form-control">
+		  			<i class="fa fa-plus"></i> Create New Project
+		  		</button>
+		  	</span>
+		</div>
+		<div class="section npb" *ngIf="selectedProject">
+		  	<div class="ml-card">
+		  		<div class="ml-card-header">
+		  			Project Details
+		  		</div>
+		  		<div class="ml-card-body">
+		  			<small><i>TITLE: </i></small>
+		  			<p>{{ selectedProject.title }}</p>
+		  			<small><i>ID: </i></small>
+		  			<p><small>{{ selectedProject.id }}</small></p>
+		  			<small><i>Description: </i></small>
+		  			<p>{{ selectedProject.description }}</p>
+		  			<small><i>Created at: </i></small>
+		  			<p>{{ selectedProject.createdAt | date:'yyyy-MM-dd HH:mm:ss Z' }}</p>
+		  			<small><i>Updated at: </i></small>
+		  			<p>{{ selectedProject.updatedAt | date:'yyyy-MM-dd HH:mm:ss Z' }}</p>
+		  			<span class="form-group nmb bt">
+				  		<p>
+				  			<a class="text-danger pointer" (click)="openDeleteConfirmationModal(confirmDeleteProject)">
+					  			<i class="fa fa-trash"></i> Delete Project
+					  		</a>
+				  		</p>
+				  	</span>
+		  		</div>
+		  	</div>
+		  	<p *ngFor="let alert of alerts">
+				<small><ngb-alert [type]="alert.type" (close)="closeAlert(alert)">{{ alert.message }}</ngb-alert></small>
+			</p>
+		</div>
+	</div>
+</div>
+<ng-template #confirmDeleteProject let-c="close" let-d="dismiss" ngbModalContainer>
+	<div class="modal-body">
+		<div class="div-wrapper">
+			<img src="assets/img/trash.png" height="128" class="logo"><br><br>
+			<div class="spinner">
+				<h6 class="text-center">
+					Are you sure ? <br><br>Do you want to delete the selected project
+				</h6>
+				<h6 class="text-danger">"{{ selectedProject.title }}"</h6>
+				<small class="center">The project and its contents will be deleted permanantely and will be unavailable.</small>
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer jcc">
+		<button type="button" class="btn btn-secondary" (click)="c('Close click')">No! Go back</button>
+		<button type="submit" (click)="deleteSelectedProject()" class="btn btn-danger">Delete project permanently!</button>
+	</div>
+</ng-template> 
+<ng-template #waiting let-c="close" let-d="dismiss" ngbModalContainer>
+	<div class="modal-body">
+		<div class="div-wrapper">
+			<img src="assets/img/waiting.png" height="128" class="logo"><br><br>
+			<div class="spinner">
+				<div class="bounce1"></div>
+				<div class="bounce2"></div>
+				<div class="bounce3"></div>
+				<br><br>
+				<h5 class="text-center">
+					Please wait while we create your project. 
+				</h5>
+			</div>
+		</div>
+	</div>
+</ng-template>
+<ng-template #content let-c="close" let-d="dismiss" ngbModalContainer>
+	<form [formGroup]="createProjectForm" (ngSubmit)="submitForm(createProjectForm.value, waiting)">
+		<div *ngIf="cloningProject">
+			<div class="modal-body">
+				<div class="cloning_project">
+					<img src="assets/img/waiting.png" height="128" class="logo"><br><br>
+					<div class="spinner">
+						<div class="bounce1"></div>
+						<div class="bounce2"></div>
+						<div class="bounce3"></div>
+						<br><br>
+						<h5 class="text-center">
+							Please wait while we clone study in to your project. 
+						</h5>
+						<small class="center">This might take a while depending upon the size of the study.</small>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div *ngIf="!cloningProject">
+			<div class="modal-header">
+				<h5 class="modal-title"><i class="fa fa-plus"></i> Create Project </h5>
+				<a class="close pull-right" aria-label="Close" (click)="d('Cross click')">
+					<span aria-hidden="true">&times;</span>
+				</a>
+			</div>
+			<div class="modal-body">			
+				<div class="form-group" [ngClass]="{'has-error':!createProjectForm.controls['title'].valid}">
+					<small><label>Title</label></small>
+					<input class="form-control" type="text" [formControl]="createProjectForm.controls['title']" >
+				</div>
+				<div class="form-group" [ngClass]="{'has-error':!createProjectForm.controls['description'].valid}">
+					<small><label for="projectTitle">Description (Optional)</label></small>
+					<textarea rows="5" class="form-control" [formControl]="createProjectForm.controls['description']"></textarea>
+				</div>
+				<div class="form-group" [ngClass]="{'has-error':!createProjectForm.controls['cloneProject'].valid}">
+					<div class="checkbox">
+						<small><label><input #someCheckbox type="checkbox" [formControl]="createProjectForm.controls['cloneProject']">&nbsp;Clone existing <a href="http://www.metabolights.org" target="_blank">Metabolights study</a></label></small>
+					</div>
+					<input [formControl]="createProjectForm.controls['studyId']" class="form-control" [attr.disabled]="createProjectForm.controls['cloneProject'].value === false || null" type="text" placeholder="Study Id. Ex: MTBLS1">
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="submit" [disabled]="!createProjectForm.valid" class="btn btn-primary">Create</button>
+				<button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
+			</div>
+		</div>
+	</form>
+</ng-template>        

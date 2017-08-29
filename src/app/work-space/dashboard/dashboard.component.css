@@ -1,0 +1,48 @@
+.cp{	
+	background-color: #2B99FF;
+	color: #fff;
+	padding: 20px;
+
+}
+
+.display-number{
+	font-size: 3.5em;
+	font-weight: bolder;
+}
+
+.tile_count .tile_stats_count {
+    margin-bottom: 10px;
+    border-bottom: 0;
+    padding: 15px;
+    border-radius: 4px;
+    padding-bottom: 10px;
+    border: 1px solid #E1E2E4;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+    -moz-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+    -webkit-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+}
+
+.tile_count .tile_stats_count .count {
+    font-size: 60px;
+}
+
+.tile_count .tile_stats_count .count {
+    line-height: 57px;
+    font-weight: 600;
+}
+
+.tile_count .tile_stats_count span {
+    font-size: 13px;
+}
+
+.tile_count .tile_stats_count .count_bottom i {
+    width: 12px;
+}
+
+.alert{
+	border-radius: 0px;
+}
+
+.npb{
+    padding-bottom: 0;
+}

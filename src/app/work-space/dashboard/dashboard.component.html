@@ -1,0 +1,57 @@
+<div class="content row">
+	<div class="col-md-9 mini-wrapper">
+		<div class="section">
+			<h3 class="title"><i class="fa fa-dashboard"></i>&nbsp;Dashboard</h3>
+		</div>
+		<div class="section ntp" >
+			<div class="row">
+				<div class="col-md-3">
+					<div routerLink="/workspace/projects" class="tile_count">
+						<div class="tile_stats_count">
+			           		<div class="blue pointer">
+								<div class="count text-primary">{{ dashBoard.projects.length }}</div>
+								<span class="count_top text-muted"><i class="fa fa-folder"></i> Total Projects</span>
+								<!-- <span class="count_bottom"><i class="green">4% </i> From last Week</span> -->
+			            	</div>
+		            	</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-xs-12 col-md-3 grey np">
+		<div class="section npb">
+			<p class="text-muted">
+				<small class="text-primary">
+					Welcome <b>{{ dashBoard.user.firstName }}</b>!
+				</small>
+			</p>
+		</div>
+		<div class="section npb">
+			<p class="text-muted">
+				<small class="text-muted">
+					Last login at:
+					<br/>
+					<b>{{ dashBoard.updatedAt | date:'yyyy-MM-dd HH:mm:ss Z' }}</b>
+				</small>
+				<br>
+				<small class="text-muted">
+					Last updated at:<br>
+					<b>{{ dashBoard.updatedAt | date:'yyyy-MM-dd HH:mm:ss Z' }}</b>
+				</small><br/>
+				<small class="text-muted">
+					Recent activity:
+					<br>
+					-
+				</small>
+			</p>
+		</div>
+		<div class="section npb">
+			<p class="text-muted">
+				<small>
+					<a routerLink="/workspace/settings" class="pointer text-muted"><i class="fa fa-cogs"></i>&nbsp;Update Settings</a>
+				</small>
+			</p>
+		</div>
+	</div>
+</div>

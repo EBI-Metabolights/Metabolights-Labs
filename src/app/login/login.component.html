@@ -1,0 +1,19 @@
+<div class="page-wrapper bg1 vc">
+    <div class="container">
+        <div class="card card-container">
+            <h4 class="text-md-center">MetaboLights Labs</h4><br>
+            <img id="profile-img" class="profile-img-card" src="assets/img/user.png" />
+            <p id="profile-name" class="profile-name-card"></p>
+            <form class="form-signin" role="form" (submit)="login($event, email.value, secret.value)">
+                <span id="reauth-email" class="reauth-email"></span>
+                <input type="email" #email class="form-control" id="useremail" placeholder="Email address">
+                <input type="password" #secret class="form-control" id="password" placeholder="Password">
+                <button class="btn btn-primary" type="submit">Sign in</button>
+            </form>
+        </div>
+        <div class="clearfix">
+           &nbsp;
+        </div>
+         <p class="text-center">Not Registered Yet? <a target="_blank" href="http://wwwdev.ebi.ac.uk/metabolights/newAccount">Register here</a></p>
+    </div>
+</div>

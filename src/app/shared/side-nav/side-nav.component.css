@@ -1,0 +1,77 @@
+.sidebar {
+    border: medium none;
+    border-radius: 0;
+    bottom: 0;
+    left: 225px;
+    margin-left: -225px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-bottom: 40px;
+    position: fixed;
+    top: 55px;
+    transition: all 0.2s ease-in-out 0s;
+    width: 225px;
+    z-index: 3;
+    font-size: 14px;
+    background-color: #222;
+}
+.sidebar .list-group a.list-group-item {
+    background: #222 none repeat scroll 0 0;
+    border: 0 none;
+    border-radius: 0;
+    color: #999;
+    text-decoration: none;
+}
+.sidebar .list-group a.router-link-active, .sidebar .list-group a:hover {
+    background: #151515 none repeat scroll 0 0;
+    color: #fff;
+}
+.sidebar .sidebar-dropdown *:focus {
+    border: medium none;
+}
+.sidebar .sidebar-dropdown .panel-title {
+    font-size: 1rem;
+    height: 50px;
+    margin-bottom: 0;
+}
+.sidebar .sidebar-dropdown .panel-title a {
+    background: #222 none repeat scroll 0 0;
+    color: #999;
+    font-weight: 400;
+    text-decoration: none;
+}
+.sidebar .sidebar-dropdown .panel-title a span {
+    display: block;
+    padding: 1rem 1.5rem 0.75rem;
+    position: relative;
+}
+.sidebar .sidebar-dropdown .panel-title a:focus, .sidebar .sidebar-dropdown .panel-title a:hover {
+    color: #fff;
+    outline: 0 none;
+    outline-offset: -2px;
+}
+.sidebar .sidebar-dropdown .panel-title:hover {
+    background: #151515 none repeat scroll 0 0;
+}
+.sidebar .sidebar-dropdown .panel-collapse {
+    border: medium none;
+}
+.sidebar .sidebar-dropdown .panel-collapse .panel-body .list-group-item {
+    background-color: #222;
+    border: 0 solid transparent;
+    border-radius: 0;
+}
+.sidebar .sidebar-dropdown .panel-collapse .panel-body .list-group-item a {
+    color: #999;
+}
+.sidebar .sidebar-dropdown .panel-collapse .panel-body .list-group-item a:hover {
+    color: #fff;
+}
+.sidebar .sidebar-dropdown .panel-collapse .panel-body .list-group-item:hover {
+    background: #151515 none repeat scroll 0 0;
+}
+
+.sidebarPushRight{
+    left: 225px !important;
+    z-index:10;
+}

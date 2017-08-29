@@ -1,0 +1,306 @@
+<div class="content row" *ngIf="project!==undefined; else elseBlock">
+	<div class="col-md-9 mini-wrapper">
+		<div class="section">
+			<h3 class="title"><b><img src="assets/img/project.png" height="16" class="logo"> &nbsp;{{ project.title }}</b></h3>
+		</div>
+		<!-- <div *ngIf="files?.length > 0" class="section ntp">
+  			<small>
+	  			<label>
+	  				<input (change)="selectAllFiles($event)" type="checkbox"> Select all
+	  			</label>
+	  		</small>
+		  	<div class="card">
+			  	<ul class="list-group list-group-flush" *ngFor="let file of files; let i = index;">
+			  		<div class="checkbox">
+						<li class="list-group-item">
+						    <label>
+						    		<input [checked]="selectedFiles.indexOf(file) > -1" (change)="updateSelectedFilesList($event, i, file)" type="checkbox"> 
+							    	&nbsp;<small>{{ file }}</small>
+					    	</label>
+				  		</li>
+					</div>
+			  	</ul>
+			</div>
+		</div>
+		<div *ngIf="files?.length == 0" class="section ntp">
+			<div class="cloning_project">
+				<img src="assets/img/safebox.png" height="128" class="logo"><br><br>
+				<div class="spinner">
+					<h6 class="text-center lighter">
+						No files yet! Upload files using aspera? 
+					</h6>
+					<small>Note: Files uploaded through Aspera might take some time to appear in the project folder.</small><br><br>
+					<small class="center"><i><button class="btn btn-sm btn-primary" (click)="asperaUpload()"><i class="fa fa-upload"></i> UPLOAD DATA </button></i></small>
+				</div>
+			</div>
+		</div> -->
+		<div class="section npt">
+			<tree-view [directory]="projectStructure"></tree-view>
+		</div>
+
+	</div>
+	<div class="col-xs-12 col-md-3 grey np">
+		<div class="section">
+		  	<small class="text-muted section-title"><i>Import data</i></small>
+		  	<div class="btn-group-sm" role="group" aria-label="...">
+				<button class="btn btn-primary pointer" data-toggle="tooltip" data-placement="bottom" title="Upload files - Aspera web browser client. Note: Files uploaded through Aspera might take some time to appear in the project folder. " (click)="showAsperaWaitingMessage(asperaMessage)">
+		  			<i class="fa fa-upload"></i> Aspera Upload
+		  		</button>
+				<button class="btn btn-info pointer" data-toggle="tooltip" data-placement="bottom" title="Upload files - Aspera command line client" (click)="open(content)">
+		  			<i class="fa fa-terminal"></i>
+		  		</button>
+		  		<a class="btn btn-default pointer" data-toggle="tooltip" data-placement="left" title="Need help with setting up Aspera" href="ftp://ftp.ebi.ac.uk/pub/databases/metabolights/documentation/MetaboLights%20Tutorial%20-%20FAQ.pdf" target="_blank">
+					<i class="fa fa-question"></i>
+				</a>
+		  	</div>
+		</div>
+		<div class="section" *ngIf="files?.length > 0">
+			<small class="text-muted section-title"><i>Tools</i></small>
+		  	<span class="form-group">
+		  		<span class="tiny text-muted"><label> File format conversions</label></span><br>
+		  		<button (click)="openMzml2IsaModal(mzml2isa)" class="btn btn-success btn-sm" [ngClass]="mzMLFiles.length <= 0 ? 'disabled' : ''" data-toggle="tooltip" data-placement="bottom" title="Parser to extract meta information from mzML mass spectrometry files and parse relevant information to a ISA-Tab structure">
+		  			.mzML <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> ISA
+		  		</button>
+		  	</span><br>
+		  	<span class="tiny text-muted"><label> Data Analysis</label></span><br>
+		  	<span class="form-group">
+		  		<button class="btn btn-info btn-sm disabled" data-toggle="tooltip" data-placement="bottom" title="Run Isotopologue Parameter Optimization (IPO) ">
+		  			<i class="fa fa-filter" aria-hidden="true"></i>
+		  		</button>
+		  	</span><br>
+			<span class="tiny text-muted"><label> Export</label></span><br>
+		  	<span class="form-group">
+		  		<button [ngClass]="isaTabDirectories.length > 0 ? '' : 'disabled'" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="bottom" title="Submit project as a study to MetaboLights Database">
+		  			<i class="fa fa-university" aria-hidden="true"></i>
+		  		</button>
+		  		<button class="btn btn-warning btn-sm disabled" data-toggle="tooltip" data-placement="bottom" title="Export as PDF file">
+		  			<i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+		  		</button>
+		  		<button class="btn btn-warning btn-sm disabled" data-toggle="tooltip" data-placement="bottom" title="Export as .zip file">
+		  			<i class="fa fa-file-archive-o" aria-hidden="true"></i>
+		  		</button>
+		  	</span>
+		</div>
+		<div class="section">
+			<small class="text-muted section-title"><i>Configuration</i></small>
+		  	<span class="form-group">
+		  		<button class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="bottom" title="Edit project details" (click)="openEditModal(editProjectDetails)"><i class="fa fa-cogs"></i></button>
+				<!-- <button class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" title="View Project Log" ><i class="fa fa-road"></i></button>  -->
+				<button [ngClass]="project.jobs.length <= 0 ? 'disabled' : ''" (click)="openJobsModal(jobs)" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="View Jobs" >
+					<i class="fa fa-tasks" aria-hidden="true"></i>&nbsp;
+					{{ project.jobs.length }}
+				</button>
+				<button *ngIf="files?.length > 0" class="btn btn-danger btn-sm" (click)="openDeleteConfirmationModal(confirmDeleteFiles)" data-toggle="tooltip" data-placement="bottom" title="Delete file(s)" ><i class="fa fa-trash"></i></button> 
+		  	</span>
+		  	<p class="alert-wrapper" *ngFor="let alert of alerts">
+				<small><ngb-alert [type]="alert.type" (close)="closeAlert(alert)">{{ alert.message }}</ngb-alert></small>
+			</p>
+		</div>
+		<div class="section">
+		  	<div class="ml-card">
+		  		<div class="ml-card-header">
+		  			Project Details
+		  		</div>
+		  		<div class="ml-card-body">
+		  			<small><i>TITLE: </i></small>
+		  			<p>{{ project.title }}</p>
+		  			<small><i>ID: </i></small>
+		  			<p><small>{{ project.id }}</small></p>
+		  			<small><i>Description: </i></small>
+		  			<p>{{ project.description }}</p>
+			    	<small><i>Created at: </i></small>
+		  			<p>{{ project.createdAt | date:'yyyy-MM-dd HH:mm:ss Z' }}</p>
+		  			<small><i>Updated at: </i></small>
+		  			<p>{{ project.updatedAt | date:'yyyy-MM-dd HH:mm:ss Z' }}</p>
+		  			<small><i>Status: </i></small>
+		  			<p *ngIf="project.isBusy">
+		  				<i class="fa fa-lock"></i>
+		  			</p>
+		  			<p *ngIf="!project.isBusy">
+		  				<i class="fa fa-unlock"></i>
+		  			</p>
+		  		</div>
+		  	</div>
+		</div>
+	</div>
+</div>
+<ng-template #elseBlock>
+	<div class="content row">
+		<div class="col-md-12 mini-wrapper">
+			<div class="div-wrapper vh80">
+				<img src="assets/img/broken-link.png" height="128" class="logo"><br>
+				<div class="spinner">
+					<h6 class="text-center">
+						Project not found
+					</h6><br>
+				</div>
+			</div>
+		</div>
+	</div>
+</ng-template>
+<ng-template #mzml2isa let-c="close" let-d="dismiss" ngbModalContainer>
+	<div class="modal-body">
+		<div *ngIf="isaTabDirectories.length == 0; else warningMZML2ISABlocl" class="div-wrapper">
+			<img src="assets/img/file-conversion.png" height="128" class="logo"><br>
+			<h2>mzml2isa</h2>
+			<small>
+				<b>Parser to extract meta information from mzML mass spectrometry files and parse relevant information to a ISA-Tab structure</b>
+			</small>
+			<small class="center tiny text-muted">Note: Conversion might take a while depending upon the size of the .mzML files.</small>
+			<br>
+			<button (click)="convertMzml2isa()" type="submit" class="btn btn-success">Convert .mzML to ISA</button>
+		</div>
+		<ng-template #warningMZML2ISABlocl>
+			<div class="div-wrapper">
+				<img src="assets/img/file-conversion.png" height="128" class="logo"><br>
+				<h2>mzml2isa</h2>
+				<small class="text-danger">
+					<b>ISA-Tab files already exists</b>
+				</small>
+				<small class="center tiny text-danger">Note: if you proceed existing ISA tab files will be replaced with new ones; any changes will be lost.</small>
+				<br>
+				<button (click)="convertMzml2isa()" type="submit" class="btn btn-success">Convert .mzML to ISA and overwrite</button>
+			</div>
+		</ng-template>
+	</div>
+</ng-template>
+<ng-template #jobs let-c="close" *ngIf="project.jobs.length > 0" let-d="dismiss" ngbModalContainer>
+	<div class="modal-header">
+	    <h5 class="modal-title">Jobs</h5>
+	</div>
+	<div class="modal-body">
+		<div *ngFor="let job of project.jobs" class="card" [ngClass]="{'card-outline-warning': job.status == 'PEND'}">
+		  <div class="card-block">
+		    <h4 class="card-title">Job ID: {{ job.job }}</h4>
+		    <h6 class="card-subtitle mb-2 text-muted">{{ job.info.message }}</h6>
+		    <span class="badge badge-default">Status: <span [innerHTML]="job.status"></span></span>
+			<a class="pointer" (click)="displayJobLogs(job)"><span class="badge badge-primary">
+		    	<i class="fa fa-eye"></i>&nbsp;View Job Output
+		    </span></a>
+		    <a class="pointer float-right" *ngIf="job.status != 'DONE'" (click)="convertMzml2isa(job)"><span class="badge badge-primary">
+		    	<i class="fa fa-refresh"></i>&nbsp;Update Status
+		    </span></a>
+			<div class="collapse logFileData" [id]="'job_'+ job.jobId">
+				<hr>
+				<small><b>Output</b></small>
+				<div [innerHTML]="job.log.out"></div>
+				<hr>
+				<small><b>Error log</b></small>
+				<div [innerHTML]="job.log.err"></div>
+			</div>
+		  </div>
+		</div>
+	</div>
+</ng-template>
+<ng-template #content let-c="close" let-d="dismiss" ngbModalContainer>
+	<form>
+		<div class="modal-header">
+			<h5 class="modal-title"><i class="fa fa-terminal"></i>&emsp;Aspera Command Line File Upload </h5>
+			<a class="close pull-right" aria-label="Close" (click)="d('Cross click')">
+				<span aria-hidden="true">&times;</span>
+			</a>
+		</div>
+		<div class="modal-body">
+			<div class="row">
+				<div class="col-md-12">
+					<small>
+						<span class="tiny">Please note if you have already setup aspera for a MetaboLights Labs project, please ignore the first 2 steps.</span><br>
+						<b>Step 1: Install Aspera ascp command line client</b><br>
+						The Aspera ascp command line client can be downloaded <i><a href="http://downloads.asperasoft.com/downloads" target="_blank">here</a></i><br><br>
+						<b>Step 2: PIP Install - MetaboLightsLabs CLI Tool</b><br>
+						<code>> pip install git+https://github.com/EBI-Metabolights/MetaboLightsLabs-PythonCLI</code><br>
+						For details on how to install PIP - <i><a href="https://pip.pypa.io/en/stable/installing/" target="_blank">Click here</a></i><br><br>
+						<b>Step 3: Upload the files</b><br>
+						<span class="tiny">Copy the following command, replace the filesToUpload with your files/folders location (array if more than one) and execute from the command line.</span><br>
+						<code>> uploadToMetaboLightsLabs.py -t {{token}} -i <b><code>< filesToUpload ></code></b> -p {{ project.id }} -s DEV</code><br><br>
+						<!-- <b>Step 3: Navigate to the folder where the Aspera command line client program ascp is installed.</b><br>
+						The location of the 'ascp' program in the filesystem:<br>
+						<span class="col-md-12">
+							<b>Mac:</b> on the desktop go cd /Applications/Aspera\ Connect.app/Contents/Resources/ there you'll see the command line utilities where you're going to use 'ascp'.<br><br>
+
+							<b>Windows:</b> the downloaded files are a bit hidden. For instance in Windows7 the ascp.exe is located in the users home directory in: AppData\Local\Programs\Aspera\Aspera Connect\bin\ascp.exe<br><br>
+
+							<b>Linux:</b> should be in your user's home directory, cd /home/username/.aspera/connect/bin/ there you'll see the command line utilities where you're going to use 'ascp'.<br><br>
+						</span> -->
+					</small>
+					<p class="tiny">For assistance contact us (please mention your error log or screenshots) <a href="mailto:metabolights-help@ebi.ac.uk">&nbsp;here</a></p>
+				</div>
+			</div>
+		</div>
+	</form>
+</ng-template>
+<ng-template #projectLocked let-c="close" let-d="dismiss" ngbModalContainer>
+	<div class="modal-body">
+		<div class="div-wrapper">
+			<img src="assets/img/waiting.png" height="128" class="logo"><br><br>
+			<div class="spinner">
+				<div class="bounce1"></div>
+				<div class="bounce2"></div>
+				<div class="bounce3"></div>
+				<br><br>
+				<h5 class="text-center">
+					Please wait while we clone study in to your project. 
+				</h5>
+				<small class="center">This might take a while depending upon the size of the study.</small>
+			</div>
+		</div>
+	</div>
+</ng-template>
+<ng-template #asperaMessage let-c="close" let-d="dismiss" ngbModalContainer>
+	<div class="modal-body">
+		<div class="div-wrapper">
+			<img src="assets/img/waiting.png" height="128" class="logo"><br><br>
+			<div class="spinner">
+				<br>
+				<h5 class="text-center">
+					Files uploaded through Aspera might take some time to appear in the project folder. 
+				</h5>
+				<small class="center">If the problem persist please contact us for more assistance</small>
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer  jcc">
+		<button class="btn btn-success" (click)="asperaUpload()">Sure! Proceed</button>
+	</div>
+</ng-template>
+<ng-template #editProjectDetails let-c="close" let-d="dismiss" ngbModalContainer>
+	<form [formGroup]="editProjectDetailsForm" (ngSubmit)="submitForm(editProjectDetailsForm.value)">
+		<div class="modal-header">
+			<h5 class="modal-title"><i class="fa fa-cogs"></i>&emsp;Settings </h5>
+			<a class="close pull-right" aria-label="Close" (click)="d('Cross click')">
+				<span aria-hidden="true">&times;</span>
+			</a>
+		</div>
+		<div class="modal-body">
+			<div class="form-group" [ngClass]="{'has-error':!editProjectDetailsForm.controls['title'].valid}">
+				<small><label>Title</label></small>
+				<input class="form-control" type="text" [formControl]="editProjectDetailsForm.controls['title']" >
+			</div>
+			<div class="form-group" [ngClass]="{'has-error':!editProjectDetailsForm.controls['description'].valid}">
+				<small><label for="projectTitle">Description (Optional)</label></small>
+				<textarea rows="5" class="form-control" [formControl]="editProjectDetailsForm.controls['description']"></textarea>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button type="submit" [disabled]="!editProjectDetailsForm.valid" class="btn btn-primary">Save</button>
+			<button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
+		</div>
+	</form>
+</ng-template>
+<ng-template #confirmDeleteFiles let-c="close" let-d="dismiss" ngbModalContainer>
+	<div class="modal-body">
+		<div class="div-wrapper">
+			<img src="assets/img/trash.png" height="128" class="logo"><br><br>
+			<div class="spinner">
+				<h5 class="text-center">
+					Are you sure ? <br><br>Do you want to delete the selected files ? 
+				</h5>
+				<small class="center">The files will be deleted permanantely and will be unavailable.</small>
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button type="submit" (click)="deleteSelectedFiles()" class="btn btn-danger">Delete</button>
+		<button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
+	</div>
+</ng-template>
