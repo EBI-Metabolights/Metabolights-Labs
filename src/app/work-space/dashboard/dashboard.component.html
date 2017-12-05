@@ -30,26 +30,33 @@
 		<div class="section npb">
 			<p class="text-muted">
 				<small class="text-muted">
-					Last login at:
-					<br/>
-					<b>{{ dashBoard.updatedAt | date:'yyyy-MM-dd HH:mm:ss Z' }}</b>
-				</small>
-				<br>
-				<small class="text-muted">
-					Last updated at:<br>
-					<b>{{ dashBoard.updatedAt | date:'yyyy-MM-dd HH:mm:ss Z' }}</b>
-				</small><br/>
-				<small class="text-muted">
 					Recent activity:
 					<br>
-					-
+					<b>{{ dashBoard.updatedAt | date:'yyyy-MM-dd HH:mm:ss Z' }}</b>
+				</small>
+			</p>
+			<p class="text-muted">
+				<small class="text-muted">
+					&nbsp;
+				</small>
+			</p>
+			<p class="text-muted">
+				<small class="text-muted">
+					&nbsp;
 				</small>
 			</p>
 		</div>
 		<div class="section npb">
 			<p class="text-muted">
 				<small>
-					<a routerLink="/workspace/settings" class="pointer text-muted"><i class="fa fa-cogs"></i>&nbsp;Update Settings</a>
+					<a routerLink="/workspace/settings" class="pointer text-muted"><i class="fa fa-cogs"></i>&nbsp;Settings</a>
+				</small>
+			</p>
+		</div>
+		<div class="section npb">
+			<p class="text-danger">
+				<small>
+					<a href="https://github.com/EBI-Metabolights/Metabolights-Labs/issues" target="_blank" class="pointer text-muted"><i class="fa fa-bug"></i>&nbsp;Report bug</a>
 				</small>
 			</p>
 		</div>

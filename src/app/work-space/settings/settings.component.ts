@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { User } from "../dashboard/user";
 import { AuthService } from "../../auth.service";
+import { contentHeaders } from '../../common/headers';
 
 @Component({
   selector: 'app-settings',
@@ -15,6 +16,7 @@ export class SettingsComponent implements OnInit {
 
   	ngOnInit() {
   		this.user = this.authService.dashBoard.user;
+  		console.log(contentHeaders);
   	}
 
 }

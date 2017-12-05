@@ -45,6 +45,9 @@ export class TreeView {
           allSelected = this.isDirectorySelected(subDirectory);
         })
       }
+      else if(this.parent.selectedDirectories.indexOf(directory) == -1){
+        allSelected = false;
+      }
     }else{
       directory.files.forEach(file => {
          if (this.parent.selectedFiles.indexOf(file) == -1){
@@ -104,6 +107,7 @@ export class TreeView {
     if(directory.directories.length > 0){
       directory.directories.forEach(directory => {
         this.addFilesRecursively(directory);
+        this.parent.selectedDirectories.push(directory)
       })
     }
     directory.files.forEach(file => {
@@ -117,6 +121,17 @@ export class TreeView {
       directory.directories.forEach(directory => {
         this.removeFilesRecursively(directory);
       })
+    }
+    let selectedDirectoryIndex = -1;
+    let index = 0
+    this.parent.selectedDirectories.forEach(pdirectory=>{
+      if(pdirectory.title === directory.title){
+        selectedDirectoryIndex = index;
+      }
+      index = index + 1;
+    })
+    if(selectedDirectoryIndex > -1){
+      this.parent.selectedDirectories.splice(selectedDirectoryIndex, 1);
     }
     directory.files.forEach(file => {
      this.parent.selectedFiles[file.index - 1] = null;

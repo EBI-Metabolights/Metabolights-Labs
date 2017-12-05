@@ -1,10 +1,10 @@
 var environment = "dev";
-var server = "http://localhost:8080/metabolights/webservice/";
+var server = "//localhost:8080/metabolights/webservice/";
 
 if (environment == "prod"){
-	server = "http://www.ebi.ac.uk/metabolights/webservice/";
+	server = "//www.ebi.ac.uk/metabolights/webservice/";
 }else if (environment == "dev"){
-	server = "http://wwwdev.ebi.ac.uk/metabolights/webservice/";
+	server = "//wwwdev.ebi.ac.uk/metabolights/webservice/";
 }
 
 export const LabsURL 			= {};

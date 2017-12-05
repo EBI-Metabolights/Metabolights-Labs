@@ -23,21 +23,16 @@
 			</div>
 		</div>
 		<div *ngIf="files?.length == 0" class="section ntp">
-			<div class="cloning_project">
-				<img src="assets/img/safebox.png" height="128" class="logo"><br><br>
-				<div class="spinner">
-					<h6 class="text-center lighter">
-						No files yet! Upload files using aspera? 
-					</h6>
-					<small>Note: Files uploaded through Aspera might take some time to appear in the project folder.</small><br><br>
-					<small class="center"><i><button class="btn btn-sm btn-primary" (click)="asperaUpload()"><i class="fa fa-upload"></i> UPLOAD DATA </button></i></small>
-				</div>
-			</div>
+			
 		</div> -->
 		<div class="section npt">
-			<tree-view [directory]="projectStructure"></tree-view>
+			<div *ngIf="files.length > 0; else noFilesBlock">
+				<tree-view [directory]="projectStructure"></tree-view>
+			</div>
+			<div>
+				
+			</div>
 		</div>
-
 	</div>
 	<div class="col-xs-12 col-md-3 grey np">
 		<div class="section">
@@ -54,7 +49,7 @@
 				</a>
 		  	</div>
 		</div>
-		<div class="section" *ngIf="files?.length > 0">
+		<div class="section" *ngIf="files.length > 0">
 			<small class="text-muted section-title"><i>Tools</i></small>
 		  	<span class="form-group">
 		  		<span class="tiny text-muted"><label> File format conversions</label></span><br>
@@ -70,14 +65,14 @@
 		  	</span><br>
 			<span class="tiny text-muted"><label> Export</label></span><br>
 		  	<span class="form-group">
-		  		<button [ngClass]="isaTabDirectories.length > 0 ? '' : 'disabled'" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="bottom" title="Submit project as a study to MetaboLights Database">
-		  			<i class="fa fa-university" aria-hidden="true"></i>
+		  		<button (click)="openSubmitAsStudyModal(submitAsStudy)"  [ngClass]="isaTabDirectories.length > 0 ? '' : 'disabled'" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Submit project as a study to MetaboLights Database">
+		  			<i class="fa fa-university" aria-hidden="true"></i>  Export to MetaboLights
 		  		</button>
 		  		<button class="btn btn-warning btn-sm disabled" data-toggle="tooltip" data-placement="bottom" title="Export as PDF file">
 		  			<i class="fa fa-file-pdf-o" aria-hidden="true"></i>
 		  		</button>
-		  		<button class="btn btn-warning btn-sm disabled" data-toggle="tooltip" data-placement="bottom" title="Export as .zip file">
-		  			<i class="fa fa-file-archive-o" aria-hidden="true"></i>
+		  		<button class="btn btn-warning btn-sm disabled" data-toggle="tooltip" data-placement="bottom" title="Download files">
+		  			<i class="fa fa-download" aria-hidden="true"></i>
 		  		</button>
 		  	</span>
 		</div>
@@ -122,8 +117,31 @@
 		  		</div>
 		  	</div>
 		</div>
+		<div class="section npb nbb">
+			<p class="text-danger">
+				<small>
+					<a href="https://github.com/EBI-Metabolights/Metabolights-Labs/issues" target="_blank" class="pointer text-muted"><i class="fa fa-bug"></i>&nbsp;Report bug</a>
+				</small>
+			</p>
+		</div>
 	</div>
 </div>
+<ng-template #noFilesBlock>
+	<div class="content row">
+		<div class="col-md-12 mini-wrapper">
+			<div class="cloning_project text-center">
+				<img src="assets/img/safebox.png" height="128" class="logo"><br><br>
+				<div class="spinner">
+					<h6 class="text-center lighter">
+						No files yet! Upload files using aspera? 
+					</h6>
+					<small>Note: Files uploaded through Aspera might take some time to appear in the project folder.</small><br><br>
+					<small class="center"><i><button class="btn btn-sm btn-primary" (click)="asperaUpload()"><i class="fa fa-upload"></i> UPLOAD DATA </button></i></small>
+				</div>
+			</div>
+		</div>
+	</div>
+</ng-template>
 <ng-template #elseBlock>
 	<div class="content row">
 		<div class="col-md-12 mini-wrapper">
@@ -164,15 +182,28 @@
 		</ng-template>
 	</div>
 </ng-template>
-<ng-template #jobs let-c="close" *ngIf="project.jobs.length > 0" let-d="dismiss" ngbModalContainer>
+<ng-template #submitAsStudy let-c="close" let-d="dismiss" ngbModalContainer>
+	<div class="modal-body">
+		<div class="div-wrapper">
+			<img src="assets/img/submit-as-study.png" height="128" class="logo"><br>
+			<h2>Submit as MetaboLights Study</h2>
+			<small>
+				<b>Upon submission, a MetaboLights Study Identifier will be assigned to the project, and you can use the MetaboLights online study editor for any further study updates. Thanks.</b>
+			</small>
+			<br>
+			<button (click)="submitProjectAsStudy()" type="submit" class="btn btn-success">Agree and proceed</button>
+		</div>
+	</div>
+</ng-template>
+<ng-template #jobs let-c="close" let-d="dismiss" ngbModalContainer>
 	<div class="modal-header">
 	    <h5 class="modal-title">Jobs</h5>
 	</div>
 	<div class="modal-body">
 		<div *ngFor="let job of project.jobs" class="card" [ngClass]="{'card-outline-warning': job.status == 'PEND'}">
 		  <div class="card-block">
-		    <h4 class="card-title">Job ID: {{ job.job }}</h4>
-		    <h6 class="card-subtitle mb-2 text-muted">{{ job.info.message }}</h6>
+		    <h4 class="card-title">Job ID: {{ job.jobId }}</h4>
+		    <h6 class="card-subtitle mb-2 text-muted"><i>{{ job.info.message }}</i></h6>
 		    <span class="badge badge-default">Status: <span [innerHTML]="job.status"></span></span>
 			<a class="pointer" (click)="displayJobLogs(job)"><span class="badge badge-primary">
 		    	<i class="fa fa-eye"></i>&nbsp;View Job Output

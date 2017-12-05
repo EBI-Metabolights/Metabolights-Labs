@@ -37,6 +37,7 @@ export class ProjectComponent implements OnInit {
   asperaMessageModalRef: NgbModalRef;
   deleteConfirmationModalRef: NgbModalRef;
   mzml2isaModalRef: NgbModalRef;
+  submitAsStudyModalRef: NgbModalRef;
   jobsModalRef: NgbModalRef;
   closeResult: string;
   editProjectDetailsForm : FormGroup;
@@ -91,7 +92,7 @@ export class ProjectComponent implements OnInit {
   // }
 
   deleteSelectedFiles(){
-    if(this.selectedFiles.length <= 0){
+    if(this.selectedFiles.length <= 0 && this.selectedDirectories.length <= 0){
       return alert("No selection provided");
     }
 
@@ -279,7 +280,7 @@ export class ProjectComponent implements OnInit {
     var finalConfig = {};
     finalConfig['transfer_specs'] = transferSpecs;
     var requestId = this.asperaWeb.startTransfers(finalConfig, {success: function(data){
-      console.log("Upload complete");
+      console.log("Upload started");
     }});
   }
 
@@ -331,6 +332,10 @@ export class ProjectComponent implements OnInit {
     this.mzml2isaModalRef = this.modalService.open(content);
   }
 
+  openSubmitAsStudyModal(content){
+    this.submitAsStudyModalRef = this.modalService.open(content);
+  }
+
   openJobsModal(content){
     if(this.project.jobs.length > 0){
       this.jobsModalRef = this.modalService.open(content);
@@ -338,7 +343,7 @@ export class ProjectComponent implements OnInit {
   }
 
   openDeleteConfirmationModal(content) {
-    if(this.selectedFiles.length <= 0){
+    if(this.selectedFiles.length <= 0 && this.selectedDirectories.length <= 0 ){
       alert("No selection provided");
       return;
     }
@@ -416,7 +421,7 @@ export class ProjectComponent implements OnInit {
          }else{
            this.alerts.push({
               id: this.alerts.length + 1,
-              type: 'update success',
+              type: 'success',
               message: 'Job Satus: '+ projectJob.status +' | ID: ' + projectJob.jobId ,
            });
            job.status = projectJob.status;

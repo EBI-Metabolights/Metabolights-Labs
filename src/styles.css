@@ -19,6 +19,10 @@ p.alert-wrapper{
     margin-bottom: 10px;
 }
 
+.nbb{
+    border-bottom: none !important;
+}
+
 a:hover{
     text-decoration: none;
 }
