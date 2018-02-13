@@ -19,11 +19,13 @@ LabsURL['deleteProject'] 		= server + 'labs-workspace/deleteProject';
 // Project
 LabsURL['projectContent'] 		= server + 'labs-project/content';
 LabsURL['projectDetails'] 		= server + 'labs-project/details';
+LabsURL['submitProject'] 		= server + 'labs-project/submitProject';
 LabsURL['editProjectDetails'] 	= server + 'labs-project/editDetails';
 LabsURL['delete'] 				= server + 'labs-project/deleteFiles';
 
 // Tools
 LabsURL['convertMZMLToISA'] 	= server + 'labs-project/convertMZMLToISA';
+LabsURL['convertNMRMLToISA'] 	= server + 'labs-project/convertNMRMLToISA';
 LabsURL['getJobLogs'] 			= server + 'labs-project/getJobLogs';
 
 

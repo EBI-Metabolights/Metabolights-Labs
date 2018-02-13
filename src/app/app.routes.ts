@@ -9,5 +9,7 @@ import { AuthGuard }  from './auth-guard.service';
 export const routes: Routes = [
 	{ path: 'login', component: LoginComponent },
 	{ path: '', redirectTo: 'workspace/dashboard', pathMatch: 'full'},
+	{ path: 'workspace/project', redirectTo: 'workspace/projects', pathMatch: 'full'},
+	{ path: 'workspace', redirectTo: 'workspace/dashboard', pathMatch: 'full'},
     { path: '**', component: PageNotFoundComponent }
 ];

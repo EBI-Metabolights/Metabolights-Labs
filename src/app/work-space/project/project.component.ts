@@ -24,19 +24,23 @@ export class ProjectComponent implements OnInit {
 
 
   @ViewChild('projectLocked') projectLocked: ElementRef;
+  @ViewChild('projectStudyLocked') projectStudyLocked: ElementRef;
 
   project: Project;
   id: string;
   projectIndex: any;
   files: string[] = [];
   mzMLFiles: string[] = [];
+  nmrMLFiles: string[] = [];
   selectedFiles: File[];
   selectedFilesFlag: boolean[];
   loadingModalRef: NgbModalRef;
+  loadingProjectModalRef: NgbModalRef;
   editingModalRef: NgbModalRef;
   asperaMessageModalRef: NgbModalRef;
   deleteConfirmationModalRef: NgbModalRef;
   mzml2isaModalRef: NgbModalRef;
+  nmrml2isaModalRef: NgbModalRef;
   submitAsStudyModalRef: NgbModalRef;
   jobsModalRef: NgbModalRef;
   closeResult: string;
@@ -145,9 +149,11 @@ export class ProjectComponent implements OnInit {
   	this.route.params.forEach((params: Params) => {
       this.id = params['id'];
     });
+    
     for(let i in this.authService.dashBoard.projects){
     	if (this.authService.dashBoard.projects[i].id == this.id){
     		this.project = this.authService.dashBoard.projects[i];
+        console.log(this.project);
         this.initForms();
         this.token = (JSON.parse(this.project.asperaSettings).asperaURL).split("/")[0];
         this.projectIndex = i;
@@ -155,7 +161,7 @@ export class ProjectComponent implements OnInit {
       }
     }
     if (this.project!==undefined && this.project.isBusy){
-      this.openLoadingModal(this.projectLocked);
+      this.openLoadingProjectModal(this.projectStudyLocked);
       this.getProjectDetails();
     }
     this.getProjectContent(this.id);
@@ -332,6 +338,10 @@ export class ProjectComponent implements OnInit {
     this.mzml2isaModalRef = this.modalService.open(content);
   }
 
+  openNmrml2IsaModal(content){
+    this.nmrml2isaModalRef = this.modalService.open(content);
+  }
+
   openSubmitAsStudyModal(content){
     this.submitAsStudyModalRef = this.modalService.open(content);
   }
@@ -364,6 +374,50 @@ export class ProjectComponent implements OnInit {
     });
   }
 
+  openLoadingProjectModal(content) {
+    this.loadingProjectModalRef = this.modalService.open(content, { backdrop : "static" });
+    this.loadingProjectModalRef.result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  submitProjectAsStudy(){
+
+    let body = {
+      "jwt" : localStorage.getItem("jwt"),
+      "user" : localStorage.getItem("user"),
+      "project_id" : this.id
+    }
+
+    this.http.post(LabsURL['submitProject'], body, { headers: contentHeaders })
+    .subscribe(
+      (response) => {
+         if(this.submitAsStudyModalRef != undefined){
+           this.submitAsStudyModalRef.close();
+         }
+         let respJob = JSON.parse(response.json().content);
+         let projectJob = new Job().deserialize(respJob);
+         
+         this.alerts.push({
+            id: this.alerts.length + 1,
+            type: 'success',
+            message: 'Job Satus: '+ projectJob.status +' | ID: ' + projectJob.jobId ,
+         });
+
+         this.openLoadingProjectModal(this.projectStudyLocked);
+         this.project.isBusy = true;
+         this.authService.initializeWorkSpace();
+        
+      },
+      error => {
+        console.log(error.text());
+      }
+    );
+
+  }
+
   displayJobLogs(job: Job){
     let body = {
       "jwt" : localStorage.getItem("jwt"),
@@ -388,6 +442,50 @@ export class ProjectComponent implements OnInit {
         $("#job_"+job.jobId).collapse('toggle');
       }
     }
+  }
+
+  convertNmrml2isa(job: Job){
+
+    let body = {
+      "jwt" : localStorage.getItem("jwt"),
+      "user" : localStorage.getItem("user"),
+      "id" : this.id
+    }
+
+    if(job != undefined){
+      body["jobId"] = job.jobId;
+    }
+
+    this.http.post(LabsURL['convertNMRMLToISA'], body, { headers: contentHeaders })
+    .subscribe(
+      (response) => {
+         if(this.nmrml2isaModalRef != undefined){
+           this.nmrml2isaModalRef.close();
+         }
+         let respJob = JSON.parse(response.json().content);
+         let projectJob = new Job().deserialize(respJob);
+         if (job == undefined){
+           this.alerts.push({
+              id: this.alerts.length + 1,
+              type: 'success',
+              message: 'Job Submitted Successful | ID: ' + projectJob.jobId + " ( STATUS: " + projectJob.status + ")",
+           });
+           this.project.jobs.push(projectJob);
+         }else{
+           this.alerts.push({
+              id: this.alerts.length + 1,
+              type: 'success',
+              message: 'Job Satus: '+ projectJob.status +' | ID: ' + projectJob.jobId ,
+           });
+           job.status = projectJob.status;
+           job = projectJob;
+         }
+      },
+      error => {
+        console.log(error.text());
+      }
+    );
+
   }
 
   convertMzml2isa(job: Job){
@@ -459,6 +557,10 @@ export class ProjectComponent implements OnInit {
 
           if(file.indexOf(".mzML") > -1 || file.indexOf(".mzml") > -1 || file.indexOf(".imzML") > -1){
              this.mzMLFiles.push(file);
+          }
+
+          if(file.indexOf(".nmrML") > -1 || file.indexOf(".nmrml") > -1){
+             this.nmrMLFiles.push(file);
           }
         }
         this.renderRichFileStructure();

@@ -53,8 +53,11 @@
 			<small class="text-muted section-title"><i>Tools</i></small>
 		  	<span class="form-group">
 		  		<span class="tiny text-muted"><label> File format conversions</label></span><br>
-		  		<button (click)="openMzml2IsaModal(mzml2isa)" class="btn btn-success btn-sm" [ngClass]="mzMLFiles.length <= 0 ? 'disabled' : ''" data-toggle="tooltip" data-placement="bottom" title="Parser to extract meta information from mzML mass spectrometry files and parse relevant information to a ISA-Tab structure">
+		  		<button *ngIf="mzMLFiles?.length > 0" (click)="openMzml2IsaModal(mzml2isa)" class="btn btn-success btn-sm" [ngClass]="mzMLFiles.length <= 0 ? 'disabled' : ''" data-toggle="tooltip" data-placement="bottom" title="Parser to extract meta information from mzML mass spectrometry files and parse relevant information to a ISA-Tab structure">
 		  			.mzML <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> ISA
+		  		</button>
+		  		<button *ngIf="nmrMLFiles?.length > 0" (click)="openNmrml2IsaModal(nmrml2isa)" class="btn btn-success btn-sm" [ngClass]="nmrMLFiles.length <= 0 ? 'hidden' : ''" data-toggle="tooltip" data-placement="bottom" title="Parser to extract meta information from nmrML  spectrometry files and parse relevant information to a ISA-Tab structure">
+		  			.nmrML <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> ISA
 		  		</button>
 		  	</span><br>
 		  	<span class="tiny text-muted"><label> Data Analysis</label></span><br>
@@ -65,9 +68,14 @@
 		  	</span><br>
 			<span class="tiny text-muted"><label> Export</label></span><br>
 		  	<span class="form-group">
-		  		<button (click)="openSubmitAsStudyModal(submitAsStudy)"  [ngClass]="isaTabDirectories.length > 0 ? '' : 'disabled'" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Submit project as a study to MetaboLights Database">
+		  		<button *ngIf="project.study == null" (click)="openSubmitAsStudyModal(submitAsStudy)"  [ngClass]="isaTabDirectories.length > 0 ? '' : 'disabled'" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Submit project as a study to MetaboLights Database">
 		  			<i class="fa fa-university" aria-hidden="true"></i>  Export to MetaboLights
 		  		</button>
+				{{ study }}
+		  		<button *ngIf="project.study != null" (click)="openSubmitAsStudyModal(submitAsStudy)"  [ngClass]="isaTabDirectories.length > 0 ? '' : 'disabled'" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Submit project as a study to MetaboLights Database">
+		  			<i class="fa fa-university" aria-hidden="true"></i>  Update {{ project.study }}
+		  		</button>
+
 		  		<button class="btn btn-warning btn-sm disabled" data-toggle="tooltip" data-placement="bottom" title="Export as PDF file">
 		  			<i class="fa fa-file-pdf-o" aria-hidden="true"></i>
 		  		</button>
@@ -182,9 +190,44 @@
 		</ng-template>
 	</div>
 </ng-template>
+<ng-template #nmrml2isa let-c="close" let-d="dismiss" ngbModalContainer>
+	<div class="modal-body">
+		<div *ngIf="isaTabDirectories.length == 0; else warningNMRML2ISABlocl" class="div-wrapper">
+			<img src="assets/img/file-conversion.png" height="128" class="logo"><br>
+			<h2>nmrml2isa</h2>
+			<small>
+				<b>Parser to extract meta information from nmrML files and parse relevant information to a ISA-Tab structure</b>
+			</small>
+			<small class="center tiny text-muted">Note: Conversion might take a while depending upon the size of the .nmrML files.</small>
+			<br>
+			<button (click)="convertNmrml2isa()" type="submit" class="btn btn-success">Convert .nrmML to ISA</button>
+		</div>
+		<ng-template #warningNMRML2ISABlocl>
+			<div class="div-wrapper">
+				<img src="assets/img/file-conversion.png" height="128" class="logo"><br>
+				<h2>nmrml2isa</h2>
+				<small class="text-danger">
+					<b>ISA-Tab files already exists</b>
+				</small>
+				<small class="center tiny text-danger">Note: if you proceed existing ISA tab files will be replaced with new ones; any changes will be lost.</small>
+				<br>
+				<button (click)="convertNmrml2isa()" type="submit" class="btn btn-success">Convert .nrmML to ISA and overwrite</button>
+			</div>
+		</ng-template>
+	</div>
+</ng-template>
 <ng-template #submitAsStudy let-c="close" let-d="dismiss" ngbModalContainer>
 	<div class="modal-body">
-		<div class="div-wrapper">
+		<div *ngIf="project.study != null" class="div-wrapper">
+			<img src="assets/img/submit-as-study.png" height="128" class="logo"><br>
+			<h2>Update MetaboLights Study <br> {{ project.study }} </h2>
+			<small>
+				<b>Upon submission, you study will be updated, and you can use the MetaboLights online study editor for any further study updates. Thanks.</b>
+			</small>
+			<br>
+			<button (click)="submitProjectAsStudy()" type="submit" class="btn btn-success">Agree and update study</button>
+		</div>
+		<div *ngIf="project.study == null" class="div-wrapper">
 			<img src="assets/img/submit-as-study.png" height="128" class="logo"><br>
 			<h2>Submit as MetaboLights Study</h2>
 			<small>
@@ -271,6 +314,23 @@
 				<br><br>
 				<h5 class="text-center">
 					Please wait while we clone study in to your project. 
+				</h5>
+				<small class="center">This might take a while depending upon the size of the study.</small>
+			</div>
+		</div>
+	</div>
+</ng-template>
+<ng-template #projectStudyLocked let-c="close" let-d="dismiss" ngbModalContainer>
+	<div class="modal-body">
+		<div class="div-wrapper">
+			<img src="assets/img/waiting.png" height="128" class="logo"><br><br>
+			<div class="spinner">
+				<div class="bounce1"></div>
+				<div class="bounce2"></div>
+				<div class="bounce3"></div>
+				<br><br>
+				<h5 class="text-center">
+					Please wait while we assign MetaboLights Study Id to your project. 
 				</h5>
 				<small class="center">This might take a while depending upon the size of the study.</small>
 			</div>

@@ -5,6 +5,7 @@ export class Project {
 	settings: string = "";
 	projectLocation: string = "";
 	asperaSettings: string = "";
+    study: string = "";
 	id : string = "";
 	title: string = "";
 	description: string = "";
@@ -18,6 +19,7 @@ export class Project {
         this.projectLocation = input.projectLocation;
         this.asperaSettings = input.asperaSettings;
         this.title = input.title;
+        this.study = input.studyId;
         this.description = input.description;
         this.id = input.id;
         this.createdAt = input.createdAt;

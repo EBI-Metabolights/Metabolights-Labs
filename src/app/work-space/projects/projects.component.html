@@ -9,7 +9,7 @@
 					<div class="col-3" [class.selectedProject]="project.id === selectedProject.id" class="p-wrapper"  (dblclick)="onSelect(project)" (click)="setSelected(project)">
 						<div>
 							<h1><i class="fa fa-folder-o fa-2x"></i></h1>
-							<h5><a>{{ project.title }}</a></h5>
+							<h5><a>{{ project.title | slice:0:18 }}</a></h5>
 							<h6 class="md">
 								<small class="tiny">
 									<span class="pull-left">
