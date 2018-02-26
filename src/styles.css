@@ -63,7 +63,7 @@ h1 {
 }
 
 .bg1{
-    background: url('/assets/img/bg.jpg') no-repeat center fixed;
+    background: url('./assets/img/bg.jpg') no-repeat center fixed;
     background-size: cover;
 }
 

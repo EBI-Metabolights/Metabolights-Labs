@@ -1,19 +1,32 @@
 <div class="page-wrapper bg1 vc">
     <div class="container">
-        <div class="card card-container">
-            <h4 class="text-md-center">MetaboLights Labs</h4><br>
-            <img id="profile-img" class="profile-img-card" src="assets/img/user.png" />
-            <p id="profile-name" class="profile-name-card"></p>
-            <form class="form-signin" role="form" (submit)="login($event, email.value, secret.value)">
-                <span id="reauth-email" class="reauth-email"></span>
-                <input type="email" #email class="form-control" id="useremail" placeholder="Email address">
-                <input type="password" #secret class="form-control" id="password" placeholder="Password">
-                <button class="btn btn-primary" type="submit">Sign in</button>
-            </form>
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
+                <br><br>
+                <h1>Online staging area to facilitate cloud based data re-analysis and submissions</h1>
+                <!-- <br>
+                <small class="text-muted">
+                    PROJECTS
+                </small><br><br>
+                <img src="assets/img/metaboflow.png" height="50" alt="">
+                <br><br> -->
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                <div class="card card-container"><br>
+                    <img id="profile-img" class="profile-img-card" src="assets/img/user.png" /><br>
+                    <h4 class="text-md-center"><img height="30" src="assets/img/logo.png" />&nbsp;MetaboLights Labs <sup class="text-danger"><small>BETA</small></sup></h4>
+                    <form class="form-signin" role="form" (submit)="login($event, email.value, secret.value)">
+                        <span id="reauth-email" class="reauth-email"></span>
+                        <input type="email" #email class="form-control" id="useremail" placeholder="Email address">
+                        <input type="password" #secret class="form-control" id="password" placeholder="Password">
+                        <button class="btn btn-primary" type="submit">Sign in</button>
+                    </form>
+                </div>
+                <div class="clearfix">
+                   &nbsp;
+                </div>
+                 <p class="text-center">Not Registered Yet? <a target="_blank" href="http://wwwdev.ebi.ac.uk/metabolights/newAccount">Register here</a></p>
+            </div>
         </div>
-        <div class="clearfix">
-           &nbsp;
-        </div>
-         <p class="text-center">Not Registered Yet? <a target="_blank" href="http://wwwdev.ebi.ac.uk/metabolights/newAccount">Register here</a></p>
     </div>
 </div>
