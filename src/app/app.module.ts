@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
+import { JsonpModule,HttpModule } from '@angular/http';
 
 // Angular2 Bootstrap import
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -36,6 +36,7 @@ import { WorkSpaceModule } from './work-space/work-space.module';
     WorkSpaceModule,
     ReactiveFormsModule,
     HttpModule,
+    JsonpModule,
     NgbModule.forRoot(),
     RouterModule.forRoot(routes)
   ],

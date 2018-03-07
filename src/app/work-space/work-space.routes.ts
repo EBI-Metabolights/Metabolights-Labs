@@ -31,6 +31,9 @@ export const WorkSpaceRoutes: Route[] = [
       {
         path: 'settings',
         component: SettingsComponent,
+        resolve: {
+          dashBoard: DashboardResolve
+        }
       },
       {
         path: 'project/:id',

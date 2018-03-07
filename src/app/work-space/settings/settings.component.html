@@ -1,47 +1,190 @@
-<div class="content row">
-	<div class="col-md-9 mini-wrapper">
-		<div class="section">
-			<h3 class="title">Settings</h3>
-		</div>
-		<div class="col-xs-12 col-sm-6">
-			<div class="list-group">
-			  <a class="list-group-item list-group-item-action flex-column align-items-start">
-			    <div class="d-flex w-100 justify-content-between">
-			      <small>First Name</small>
-			      <h5 class="mb-1">{{ user.firstName }}</h5>
-			    </div>
-			  </a>
-			  <a class="list-group-item list-group-item-action flex-column align-items-start">
-			    <div class="d-flex w-100 justify-content-between">
-			      <small>Last Name</small>
-			      <h5 class="mb-1">{{ user.lastName }}</h5>
-			    </div>
-			  </a>
-			  <a class="list-group-item list-group-item-action flex-column align-items-start">
-			    <div class="d-flex w-100 justify-content-between">
-			      <small>Email</small>
-			      <h5 class="mb-1">{{ user.email }}</h5>
-			    </div>
-			  </a>
-			  <a class="list-group-item list-group-item-action flex-column align-items-start">
-			    <div class="d-flex w-100 justify-content-between">
-			      <small>Address</small>
-			      <h5 class="mb-1">{{ user.address }}</h5>
-			    </div>
-			  </a>
-			  <a class="list-group-item list-group-item-action flex-column align-items-start">
-			    <div class="d-flex w-100 justify-content-between">
-			      <small>Affiliation</small>
-			      <h5 class="mb-1">{{ user.affiliation }}</h5>
-			    </div>
-			  </a>
-			  <a class="list-group-item list-group-item-action flex-column align-items-start">
-			    <div class="d-flex w-100 justify-content-between">
-			      <small>ORCID Id</small>
-			      <h5 class="mb-1">{{user.orcid ? user.orcid : '-'}}</h5>
-			    </div>
-			  </a>
+<div class="content">
+	<div class="mini-wrapper">
+		<div class="col-md-12">
+			<div class="row">
+				<div class="col-md-6">
+					<div class="section">
+						<h3 class="title">Personal details</h3>
+						<br>
+						<div class="list-group">
+						  <a class="list-group-item list-group-item-action flex-column align-items-start">
+						    <div class="d-flex w-100 justify-content-between">
+						      <small>First Name</small>
+						      <h5 class="mb-1">{{ user.firstName }}</h5>
+						    </div>
+						  </a>
+						  <a class="list-group-item list-group-item-action flex-column align-items-start">
+						    <div class="d-flex w-100 justify-content-between">
+						      <small>Last Name</small>
+						      <h5 class="mb-1">{{ user.lastName }}</h5>
+						    </div>
+						  </a>
+						  <a class="list-group-item list-group-item-action flex-column align-items-start">
+						    <div class="d-flex w-100 justify-content-between">
+						      <small>Email</small>
+						      <h5 class="mb-1">{{ user.email }}</h5>
+						    </div>
+						  </a>
+						  <a class="list-group-item list-group-item-action flex-column align-items-start">
+						    <div class="d-flex w-100 justify-content-between">
+						      <small>Address</small>
+						      <h5 class="mb-1">{{ user.address }}</h5>
+						    </div>
+						  </a>
+						  <a class="list-group-item list-group-item-action flex-column align-items-start">
+						    <div class="d-flex w-100 justify-content-between">
+						      <small>Affiliation</small>
+						      <h5 class="mb-1">{{ user.affiliation }}</h5>
+						    </div>
+						  </a>
+						  <a class="list-group-item list-group-item-action flex-column align-items-start">
+						    <div class="d-flex w-100 justify-content-between">
+						      <small>ORCID Id</small>
+						      <h5 class="mb-1">{{user.orcid ? user.orcid : '-'}}</h5>
+						    </div>
+						  </a>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="section">
+						<h3 class="title">Galaxy Workflow Settings
+							<span class="pull-right">
+								<button (click)="openGalaxyModal(addGalaxyInstance)" type="button" class="btn btn-success btn-sm"> <i class="fa fa-plus"></i> Add</button>
+							</span>
+						</h3>
+						<br>
+						<div *ngIf="settings.galaxy == undefined || galaxyInstances.length == 0;else instancesExist" class="text-center">
+							<small class="text-muted">
+								Get started now with workflows. Add your Galaxy instance <span class="text-primary" (click)="openGalaxyModal(addGalaxyInstance)">here</span>
+							</small>
+						</div>
+						<ng-template #instancesExist>
+							<li class="list-group pb10" *ngFor="let instance of galaxyInstances">
+								<a class="list-group-item">
+									<span class="list-group-item-text">
+										<h4 class="list-group-item-heading">{{ instance.name }} 
+											<span>
+												<small>&nbsp;
+													<a (click)="openEditGalaxyModal(editGalaxyInstance, instance)"><i class="fa fa-pencil text-primary"></i></a>
+													<a (click)="openDeleteGalaxyModal(deleteGalaxyInstance, instance)"><i class="fa fa-trash text-danger"></i></a>
+												</small>
+											</span>
+										</h4>
+										<small>
+											<b>URL:</b> {{ instance.url }}
+										</small>
+										<br>
+										<small>
+											<b>API Key:</b> {{ instance.apikey }}
+										</small>
+									</span>
+								</a>
+							</li>
+						</ng-template>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>        
+</div>     
+<ng-template #addGalaxyInstance let-c="close" let-d="dismiss" ngbModalContainer>
+	<form [formGroup]="addGalaxyDetailsForm" (ngSubmit)="submitForm(addGalaxyDetailsForm.value)">
+		<div class="modal-header">
+			<h5 class="modal-title"><i class="fa fa-plus"></i>&emsp;Galaxy details </h5>
+			<a class="close pull-right" aria-label="Close" (click)="d('Cross click')">
+				<span aria-hidden="true">&times;</span>
+			</a>
+		</div>
+		<div class="modal-body">
+			<div class="form-group" [ngClass]="{'has-error':!addGalaxyDetailsForm.controls['title'].valid}">
+				<small><label>Name*</label></small>
+				<input class="form-control" type="text" [formControl]="addGalaxyDetailsForm.controls['title']" >
+			</div>
+			<div class="form-group" [ngClass]="{'has-error':!addGalaxyDetailsForm.controls['url'].valid}">
+				<small><label>URL*</label></small>
+				<input class="form-control" type="text" [formControl]="addGalaxyDetailsForm.controls['url']" >
+			</div>
+			<div class="form-group" [ngClass]="{'has-error':!addGalaxyDetailsForm.controls['apikey'].valid}">
+				<small><label>API Key*</label></small>
+				<input class="form-control" type="text" [formControl]="addGalaxyDetailsForm.controls['apikey']" >
+			</div>
+			<div class="form-group" [ngClass]="{'has-error':!addGalaxyDetailsForm.controls['description'].valid}">
+				<small><label for="projectTitle">Description (Optional)</label></small>
+				<textarea rows="5" class="form-control" [formControl]="addGalaxyDetailsForm.controls['description']"></textarea>
+			</div>
+			<div class="form-group">
+				<small><i>* required</i></small>
+				<span *ngIf="addGalaxyDetailsForm.error">
+					{{ addGalaxyDetailsForm.error }}
+				</span>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button type="submit" [disabled]="!addGalaxyDetailsForm.valid" class="btn btn-primary">Add</button>
+			<button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
+		</div>
+	</form>
+</ng-template> 
+<ng-template #editGalaxyInstance let-c="close" let-d="dismiss" ngbModalContainer>
+	<form [formGroup]="addGalaxyDetailsForm" (ngSubmit)="submitForm(addGalaxyDetailsForm.value)">
+		<div class="modal-header">
+			<h5 class="modal-title"><i class="fa fa-pencil"></i>&emsp;Edit Galaxy details </h5>
+			<a class="close pull-right" aria-label="Close" (click)="d('Cross click')">
+				<span aria-hidden="true">&times;</span>
+			</a>
+		</div>
+		<div class="modal-body">
+			<div class="form-group" [ngClass]="{'has-error':!addGalaxyDetailsForm.controls['title'].valid}">
+				<small><label>Name*</label></small>
+				<input class="form-control" type="text" [formControl]="addGalaxyDetailsForm.controls['title']" >
+			</div>
+			<div class="form-group" [ngClass]="{'has-error':!addGalaxyDetailsForm.controls['url'].valid}">
+				<small><label>URL*</label></small>
+				<input [attr.disabled]="''" class="form-control" type="text" [formControl]="addGalaxyDetailsForm.controls['url']" >
+			</div>
+			<div class="form-group" [ngClass]="{'has-error':!addGalaxyDetailsForm.controls['apikey'].valid}">
+				<small><label>API Key*</label></small>
+				<input class="form-control" type="text" [formControl]="addGalaxyDetailsForm.controls['apikey']" >
+			</div>
+			<div class="form-group" [ngClass]="{'has-error':!addGalaxyDetailsForm.controls['description'].valid}">
+				<small><label for="projectTitle">Description (Optional)</label></small>
+				<textarea rows="5" class="form-control" [formControl]="addGalaxyDetailsForm.controls['description']"></textarea>
+			</div>
+			<div class="form-group">
+				<small><i>* required</i></small>
+				<span *ngIf="addGalaxyDetailsForm.error">
+					{{ addGalaxyDetailsForm.error }}
+				</span>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button type="submit" [disabled]="!addGalaxyDetailsForm.valid" class="btn btn-primary">Update</button>
+			<button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
+		</div>
+	</form>
+</ng-template> 
+<ng-template #deleteGalaxyInstance let-c="close" let-d="dismiss" ngbModalContainer>
+	<form [formGroup]="addGalaxyDetailsForm" (ngSubmit)="submitDeleteForm(addGalaxyDetailsForm.value)">
+		<div class="modal-header">
+			<h5 class="modal-title"><i class="text-danger fa fa-trash"></i>&emsp;Delete Galaxy Instance</h5>
+			<a class="close pull-right" aria-label="Close" (click)="d('Cross click')">
+				<span aria-hidden="true">&times;</span>
+			</a>
+		</div>
+		<div class="modal-body">
+			<div class="div-wrapper">
+				<img src="assets/img/trash.png" height="128" class="logo"><br><br>
+				<div class="spinner">
+					<h5 class="text-center">
+						Are you sure you want to delete this galaxy instance ? 
+					</h5>
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button type="submit" [disabled]="!addGalaxyDetailsForm.valid" class="btn btn-primary">Delete!</button>
+			<button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
+		</div>
+	</form>
+</ng-template>   

@@ -14,7 +14,7 @@ import { ProjectComponent } from '../project/project.component';
   <a class="pointer" (click)="toogleDirectory($event)" *ngIf="directory.level > 0">
     {{ directory.title }}
   </a>
-  <ul [ngClass]="{'npl' : directory.level == 0}">
+  <ul [ngClass]="{'hide' :  directory.level > 0, 'npl' :  directory.level == 0}">
     <li *ngFor="let subDirectory of directory.directories">
       <tree-view [directory]="subDirectory"></tree-view>
     </li>
@@ -59,7 +59,7 @@ export class TreeView {
   }
 
   toogleDirectory(event){
-    event.target.nextElementSibling.style.display = event.target.nextElementSibling.style.display == "none" ? "block" : "none";
+    event.target.nextElementSibling.classList.toggle("hide");
   }
 
   isISAFile(file){

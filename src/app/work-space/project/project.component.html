@@ -3,34 +3,9 @@
 		<div class="section">
 			<h3 class="title"><b><img src="assets/img/project.png" height="16" class="logo"> &nbsp;{{ project.title }}</b></h3>
 		</div>
-		<!-- <div *ngIf="files?.length > 0" class="section ntp">
-  			<small>
-	  			<label>
-	  				<input (change)="selectAllFiles($event)" type="checkbox"> Select all
-	  			</label>
-	  		</small>
-		  	<div class="card">
-			  	<ul class="list-group list-group-flush" *ngFor="let file of files; let i = index;">
-			  		<div class="checkbox">
-						<li class="list-group-item">
-						    <label>
-						    		<input [checked]="selectedFiles.indexOf(file) > -1" (change)="updateSelectedFilesList($event, i, file)" type="checkbox"> 
-							    	&nbsp;<small>{{ file }}</small>
-					    	</label>
-				  		</li>
-					</div>
-			  	</ul>
-			</div>
-		</div>
-		<div *ngIf="files?.length == 0" class="section ntp">
-			
-		</div> -->
 		<div class="section npt">
-			<div *ngIf="files.length > 0; else noFilesBlock">
+			<div *ngIf="files.length > 0 && !processing else noFilesBlock">
 				<tree-view [directory]="projectStructure"></tree-view>
-			</div>
-			<div>
-				
 			</div>
 		</div>
 	</div>
@@ -49,7 +24,16 @@
 				</a>
 		  	</div>
 		</div>
-		<div class="section" *ngIf="files.length > 0">
+		<div class="section" *ngIf="galaxyInstances && galaxyInstances.length > 0 && files.length > 0">
+		  	<span class="tiny text-muted"><label>Galaxy Workflows</label></span><br>
+		  	<span class="form-group">
+		  		
+		  		<button (click)="openExportDataToGalaxyModal(exportToGalaxy)" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Export files to Galaxy instance">
+		  			<i class="fa fa-upload" aria-hidden="true"></i>
+		  		</button>
+		  	</span>
+		 </div>
+		 <div class="section" *ngIf="files.length > 0">
 			<small class="text-muted section-title"><i>Tools</i></small>
 		  	<span class="form-group">
 		  		<span class="tiny text-muted"><label> File format conversions</label></span><br>
@@ -59,13 +43,8 @@
 		  		<button *ngIf="nmrMLFiles?.length > 0" (click)="openNmrml2IsaModal(nmrml2isa)" class="btn btn-success btn-sm" [ngClass]="nmrMLFiles.length <= 0 ? 'hidden' : ''" data-toggle="tooltip" data-placement="bottom" title="Parser to extract meta information from nmrML  spectrometry files and parse relevant information to a ISA-Tab structure">
 		  			.nmrML <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> ISA
 		  		</button>
-		  	</span><br>
-		  	<span class="tiny text-muted"><label> Data Analysis</label></span><br>
-		  	<span class="form-group">
-		  		<button class="btn btn-info btn-sm disabled" data-toggle="tooltip" data-placement="bottom" title="Run Isotopologue Parameter Optimization (IPO) ">
-		  			<i class="fa fa-filter" aria-hidden="true"></i>
-		  		</button>
-		  	</span><br>
+		  	</span>
+		 	<br>
 			<span class="tiny text-muted"><label> Export</label></span><br>
 		  	<span class="form-group">
 		  		<button *ngIf="project.study == null" (click)="openSubmitAsStudyModal(submitAsStudy)"  [ngClass]="isaTabDirectories.length > 0 ? '' : 'disabled'" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Submit project as a study to MetaboLights Database">
@@ -75,13 +54,6 @@
 		  		<button *ngIf="project.study != null" (click)="openSubmitAsStudyModal(submitAsStudy)"  [ngClass]="isaTabDirectories.length > 0 ? '' : 'disabled'" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Submit project as a study to MetaboLights Database">
 		  			<i class="fa fa-university" aria-hidden="true"></i>  Update {{ project.study }}
 		  		</button>
-
-		  		<button class="btn btn-warning btn-sm disabled" data-toggle="tooltip" data-placement="bottom" title="Export as PDF file">
-		  			<i class="fa fa-file-pdf-o" aria-hidden="true"></i>
-		  		</button>
-		  		<button class="btn btn-warning btn-sm disabled" data-toggle="tooltip" data-placement="bottom" title="Download files">
-		  			<i class="fa fa-download" aria-hidden="true"></i>
-		  		</button>
 		  	</span>
 		</div>
 		<div class="section">
@@ -89,9 +61,8 @@
 		  	<span class="form-group">
 		  		<button class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="bottom" title="Edit project details" (click)="openEditModal(editProjectDetails)"><i class="fa fa-cogs"></i></button>
 				<!-- <button class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" title="View Project Log" ><i class="fa fa-road"></i></button>  -->
-				<button [ngClass]="project.jobs.length <= 0 ? 'disabled' : ''" (click)="openJobsModal(jobs)" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="View Jobs" >
-					<i class="fa fa-tasks" aria-hidden="true"></i>&nbsp;
-					{{ project.jobs.length }}
+				<button *ngIf="project.jobs.length > 0" [ngClass]="project.jobs.length <= 0 ? 'disabled' : ''" (click)="openJobsModal(jobs)" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="View Jobs" >
+					<i class="fa fa-tasks" aria-hidden="true"></i>&nbsp;Logs
 				</button>
 				<button *ngIf="files?.length > 0" class="btn btn-danger btn-sm" (click)="openDeleteConfirmationModal(confirmDeleteFiles)" data-toggle="tooltip" data-placement="bottom" title="Delete file(s)" ><i class="fa fa-trash"></i></button> 
 		  	</span>
@@ -134,8 +105,52 @@
 		</div>
 	</div>
 </div>
+<ng-template #exportToGalaxy let-c="close" let-d="dismiss" ngbModalContainer>
+	<div>
+		<div class="modal-header">
+			<h5 class="modal-title"><i class="fa fa-cogs"></i>&emsp;Export files to galaxy </h5>
+			<a class="close pull-right" aria-label="Close" (click)="d('Cross click')">
+				<span aria-hidden="true">&times;</span>
+			</a>
+		</div>
+		<div class="modal-body">
+			<div class="form-group">
+				<small><label>Select Galaxy Instance</label></small>
+				<select class="form-control" #selectedGalaxy (change)="onChangeGalaxyInstance($event, selectedGalaxy.value)">
+					<option value="">Select galaxy instance</option>
+				    <option *ngFor="let instance of galaxyInstances" [value]="instance.url">
+				        {{ instance.name}}
+				    </option>
+				</select>
+			</div>
+			<div *ngIf="selectedGalaxy.value != '' && histories.length > 0" class="form-group">
+				<small><label>Select History</label></small>
+				<select class="form-control" #selectedHistory (change)="onChangeGalaxyHistory($event, selectedHistory.value)">
+					<option value="">Select history</option>
+				    <option *ngFor="let history of histories" [value]="history.id">
+				        {{history.name}}&nbsp;-&nbsp;({{history.id}})
+				    </option>
+				</select>
+			</div>
+			<div *ngIf="error != null" class="alert alert-danger">
+				<strong>{{ error }}</strong> 
+			</div>
+		</div>
+		<div class="modal-footer">
+			<div *ngIf="processing">
+				<button class="btn btn-primary" [disabled]="true"><i class="fa fa-spinner fa-pulse fa-fw"></i> Export</button>
+			</div>
+			<div *ngIf="!processing">
+				<button type="submit" class="btn btn-primary" [disabled]="selectedHistory == '' || selectedGalaxy == ''"  (click)="exportFilesToGalaxy()">Export</button>
+			</div>
+				
+
+			<button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
+		</div>
+	</div>
+</ng-template>
 <ng-template #noFilesBlock>
-	<div class="content row">
+	<div *ngIf="!processing" class="content row">
 		<div class="col-md-12 mini-wrapper">
 			<div class="cloning_project text-center">
 				<img src="assets/img/safebox.png" height="128" class="logo"><br><br>
@@ -146,6 +161,16 @@
 					<small>Note: Files uploaded through Aspera might take some time to appear in the project folder.</small><br><br>
 					<small class="center"><i><button class="btn btn-sm btn-primary" (click)="asperaUpload()"><i class="fa fa-upload"></i> UPLOAD DATA </button></i></small>
 				</div>
+			</div>
+		</div>
+	</div>
+	<div *ngIf="processing" class="content row">
+		<div class="div-wrapper col-md-12">
+			<img src="assets/img/waiting.png" height="128" class="logo"><br><br>
+			<div class="spinner">
+				<div class="bounce1"></div>
+				<div class="bounce2"></div>
+				<div class="bounce3"></div>
 			</div>
 		</div>
 	</div>

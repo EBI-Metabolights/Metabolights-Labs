@@ -1,6 +1,6 @@
 # MetabolightsLabs
 
-MetaboLights labs is the online staging area to facilitate cloud based data re-analysis and submissions
+MetaboLights labs is the online staging area to facilitate cloud based data analysis, re-analysis and submissions.
 
 
 ## Features
