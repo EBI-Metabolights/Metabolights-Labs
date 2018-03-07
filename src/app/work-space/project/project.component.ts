@@ -9,7 +9,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { contentHeaders } from '../../common/headers';
 import { LabsURL } from '../../common/globals';
 import { Observable } from 'rxjs/Observable';
-import { Http, Response, Headers } from '@angular/http';
+import { Jsonp, Http, Response, Headers } from '@angular/http';
 import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 declare var $: any;
@@ -26,14 +26,22 @@ export class ProjectComponent implements OnInit {
   @ViewChild('projectLocked') projectLocked: ElementRef;
   @ViewChild('projectStudyLocked') projectStudyLocked: ElementRef;
 
+  processing: boolean = false;
+
   project: Project;
   id: string;
   projectIndex: any;
   files: string[] = [];
   mzMLFiles: string[] = [];
   nmrMLFiles: string[] = [];
+  histories: object[] = [];
+  selectedHistory: string = "";
+  selectedGalaxy: string = "";
+  selectedGalaxyInstance: any;
+  galaxyInstances: any;
   selectedFiles: File[];
   selectedFilesFlag: boolean[];
+
   loadingModalRef: NgbModalRef;
   loadingProjectModalRef: NgbModalRef;
   editingModalRef: NgbModalRef;
@@ -43,6 +51,10 @@ export class ProjectComponent implements OnInit {
   nmrml2isaModalRef: NgbModalRef;
   submitAsStudyModalRef: NgbModalRef;
   jobsModalRef: NgbModalRef;
+  error: any = null;
+
+  exportToGalaxyModalRef: NgbModalRef;
+
   closeResult: string;
   editProjectDetailsForm : FormGroup;
   token: String;
@@ -62,7 +74,7 @@ export class ProjectComponent implements OnInit {
   //connect_id = "aspera-web";
   asperaWeb: any; 
 
-  constructor(private authService: AuthService, private route: ActivatedRoute, private router: Router, private modalService: NgbModal, public http: Http, private fb: FormBuilder) { 
+  constructor(private authService: AuthService, private route: ActivatedRoute, private router: Router, private modalService: NgbModal, public http: Http, private jsonp: Jsonp, private fb: FormBuilder) { 
     this.selectedFiles = [];
     this.projectStructure = new Directory();
   }
@@ -145,15 +157,110 @@ export class ProjectComponent implements OnInit {
     );
   }
 
+  openExportDataToGalaxyModal(content){
+     this.error = null;
+    if( this.selectedFiles.length <= 0){
+      alert("Please select files to export");
+    }else{
+      this.exportToGalaxyModalRef = this.modalService.open(content);
+      this.exportToGalaxyModalRef.result.then((result) => {
+        this.closeResult = `Closed with: ${result}`;
+      }, (reason) => {
+        this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+      });
+    }
+  }
+
+  getGalaxyHistories(galaxyUrl){
+    this.error = null;
+
+    
+    this.galaxyInstances.forEach( (instance) =>{
+      if (instance.url == galaxyUrl){
+        this.selectedGalaxyInstance = instance;
+      }
+    })
+
+    this.histories = [];
+
+    this.jsonp.get(this.selectedGalaxyInstance.url + "api/histories?key=" + this.selectedGalaxyInstance.apikey + "&callback=JSONP_CALLBACK").map(res => {
+       this.histories = res.json();
+    }).subscribe( response => {
+      this.error = response;
+    })
+  }
+
+  onChangeGalaxyInstance(event, galaxy){
+    this.selectedGalaxy = galaxy;
+    this.getGalaxyHistories(galaxy)
+  }
+
+  onChangeGalaxyHistory(event, history){
+    this.selectedHistory = history
+  }
+
+  exportFilesToGalaxy(){
+    if(this.selectedFiles.length <=0){
+
+      alert("Please select files to export");
+
+    }else{
+
+      this.processing = true;
+      let fileInputs = "";
+      this.selectedFiles.forEach( file => {
+        if (fileInputs == ""){
+          fileInputs = LabsURL['download'] + "?apikey=" + this.token + "&path=" + this.project.id + file.title 
+        }else{
+          fileInputs = fileInputs + "\\n" + LabsURL['download'] + "?apikey=" + this.token + "&path=" + this.project.id + file.title 
+        }
+      })
+
+      let body = new FormData();
+      body.append('tool_id', 'upload1');
+      body.append('history_id', this.selectedHistory);
+      body.append('inputs', '{"file_count":1,"file_type":"auto","files_0|to_posix_lines":"False","files_0|url_paste":"' + fileInputs + '"}');
+      const contentHeaders = new Headers();
+      contentHeaders.append('Content-Type', 'application/x-www-form-urlencoded');
+
+      this.http.post(this.selectedGalaxyInstance.url + "api/tools?key=" + this.selectedGalaxyInstance.apikey, body)
+        .subscribe(
+          (response) => {
+            this.exportToGalaxyModalRef.close();
+            this.selectedFiles = [];
+            this.processing = false;
+            this.alerts.push({
+              id: 1,
+              type: 'success',
+              message: 'Files exported to galaxy successfully',
+            });
+          },
+          error => {
+            console.log(error)
+            if(error.status == 0){
+              this.alerts.push({
+                id: 1,
+                type: 'success',
+                message: 'Files exported to galaxy successfully <a target="_blank" href="' + this.selectedGalaxyInstance.url + 'history/view_multiple">view in galaxy</a',
+              });
+            }
+            this.exportToGalaxyModalRef.close();
+            this.selectedFiles = [];
+            this.processing = false;
+            this.processing = false;
+          }
+      );
+    }
+  }
+
   ngOnInit() {
   	this.route.params.forEach((params: Params) => {
       this.id = params['id'];
     });
-    
+    this.files = [];
     for(let i in this.authService.dashBoard.projects){
     	if (this.authService.dashBoard.projects[i].id == this.id){
     		this.project = this.authService.dashBoard.projects[i];
-        console.log(this.project);
         this.initForms();
         this.token = (JSON.parse(this.project.asperaSettings).asperaURL).split("/")[0];
         this.projectIndex = i;
@@ -168,7 +275,13 @@ export class ProjectComponent implements OnInit {
     $(function () {
       $('[data-toggle="tooltip"]').tooltip()
     });
+
+    if(this.authService.dashBoard.settings['galaxy']){
+      this.galaxyInstances = JSON.parse(this.authService.dashBoard.settings['galaxy']);
+    }
   }
+
+
 
   submitForm(body: any){
       body["jwt"] = localStorage.getItem("jwt");
@@ -408,8 +521,6 @@ export class ProjectComponent implements OnInit {
 
          this.openLoadingProjectModal(this.projectStudyLocked);
          this.project.isBusy = true;
-         this.authService.initializeWorkSpace();
-        
       },
       error => {
         console.log(error.text());
@@ -539,9 +650,11 @@ export class ProjectComponent implements OnInit {
       "user" : localStorage.getItem("user"),
       "id" : id
     }
+    this.processing = true;
     this.http.post(LabsURL['projectContent'], body, { headers: contentHeaders })
     .subscribe(
       (response) => {
+        this.processing = false;
         this.selectedFiles = [];
         this.processedFolders = [];
         this.projectStructure = new Directory();

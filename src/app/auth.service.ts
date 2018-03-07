@@ -55,7 +55,6 @@ export class AuthService {
 			},
 			error => {
 				alert(error.text());
-				console.log(error.text());
 			}
 		);
 	}
