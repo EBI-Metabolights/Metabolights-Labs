@@ -1,31 +1,37 @@
 var environment = "dev";
-var server = "http://localhost:8080/metabolights/webservice/";
+var domain = "http://localhost:8080/metabolights/";
 
 if (environment == "prod"){
-	server = "https://www.ebi.ac.uk/metabolights/webservice/";
+	domain = "https://www.ebi.ac.uk/metabolights/";
 }else if (environment == "dev"){
-	server = "http://wwwdev.ebi.ac.uk/metabolights/webservice/";
+	domain = "http://wwwdev.ebi.ac.uk/metabolights/";
 }
 
 export const LabsURL 			= {};
+
+LabsURL['domain']				= domain
+
+let webservice = domain + "webservice/"
+
 // Application
-LabsURL['authenticate'] 		= server + 'labs/authenticate';
+LabsURL['authenticate'] 		= webservice + 'labs/authenticate';
+LabsURL['studiesList'] 			= webservice + 'study/list';
 
 // Workspace
-LabsURL['initialise'] 			= server + 'labs-workspace/initialise';
-LabsURL['createProject'] 		= server + 'labs-workspace/createProject';
-LabsURL['deleteProject'] 		= server + 'labs-workspace/deleteProject';
-LabsURL['settings'] 			= server + 'labs-workspace/settings';
-LabsURL['download'] 			= server + 'labs-workspace/downloadFile';
+LabsURL['initialise'] 			= webservice + 'labs-workspace/initialise';
+LabsURL['createProject'] 		= webservice + 'labs-workspace/createProject';
+LabsURL['deleteProject'] 		= webservice + 'labs-workspace/deleteProject';
+LabsURL['settings'] 			= webservice + 'labs-workspace/settings';
+LabsURL['download'] 			= webservice + 'labs-workspace/downloadFile';
 
 // Project
-LabsURL['projectContent'] 		= server + 'labs-project/content';
-LabsURL['projectDetails'] 		= server + 'labs-project/details';
-LabsURL['submitProject'] 		= server + 'labs-project/submitProject';
-LabsURL['editProjectDetails'] 	= server + 'labs-project/editDetails';
-LabsURL['delete'] 				= server + 'labs-project/deleteFiles';
+LabsURL['projectContent'] 		= webservice + 'labs-project/content';
+LabsURL['projectDetails'] 		= webservice + 'labs-project/details';
+LabsURL['submitProject'] 		= webservice + 'labs-project/submitProject';
+LabsURL['editProjectDetails'] 	= webservice + 'labs-project/editDetails';
+LabsURL['delete'] 				= webservice + 'labs-project/deleteFiles';
 
 // Tools
-LabsURL['convertMZMLToISA'] 	= server + 'labs-project/convertMZMLToISA';
-LabsURL['convertNMRMLToISA'] 	= server + 'labs-project/convertNMRMLToISA';
-LabsURL['getJobLogs'] 			= server + 'labs-project/getJobLogs';
+LabsURL['convertMZMLToISA'] 	= webservice + 'labs-project/convertMZMLToISA';
+LabsURL['convertNMRMLToISA'] 	= webservice + 'labs-project/convertNMRMLToISA';
+LabsURL['getJobLogs'] 			= webservice + 'labs-project/getJobLogs';
