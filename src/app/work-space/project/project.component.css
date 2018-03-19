@@ -21,6 +21,11 @@
 	font-weight: lighter;
 }
 
+.alert-custom{
+	margin-top: 0 !important;
+	margin-bottom: 10px !important;
+}
+
 .spinner{
 	position: relative !important;
     top: 0%;

@@ -127,19 +127,46 @@ export class ProjectsComponent implements OnInit {
 
     submitForm(body: any, waiting){
 
-      this.waitingModalRef = this.modalService.open(waiting);
+      this.waitingModalRef = this.modalService.open(waiting, { backdrop : "static" });
 
       if(body.cloneProject == true){
         if (body.studyId == "" || body.studyId == null ){
            alert('Please provide a valid MetaboLights Study ID');
+           this.waitingModalRef.close(); 
            return;
         }else{
-           this.cloningProject = true;
+          let studies: string[]; 
+          this.http.get(LabsURL['studiesList'], { headers: contentHeaders })
+          .subscribe(
+            (response) => {
+              studies = response.json().content
+              let studyExists = false;
+                studies.forEach( study => {
+                   if ( study === body.studyId.toUpperCase() ){
+                     studyExists = true;
+                   }
+                })
+
+                if (studyExists){
+                  this.cloningProject = true;
+                  this.submitCreateRequest(body);
+                }else{
+                  alert("Invalid study identifier. Note: Cloning is currently supported only for public studies")
+                  this.waitingModalRef.close(); 
+                  return;
+              }
+            },
+            error => {
+              console.log(error);    
+            }
+          );
         }
+      }else{
+        this.submitCreateRequest(body);
       }
+    }
 
-      this.modalRef.close();
-
+    submitCreateRequest(body){
       body["jwt"] = localStorage.getItem("jwt");
       body["user"] = localStorage.getItem("user");
 
@@ -158,6 +185,7 @@ export class ProjectsComponent implements OnInit {
               message: 'Project ' + project.title + ' creation successful!',
             });
             this.initForms();
+            this.modalRef.close();
             this.waitingModalRef.close();
           },
           error => {
@@ -167,9 +195,8 @@ export class ProjectsComponent implements OnInit {
               message: 'Project creation unsuccessful! Error',
             });
             console.log(error.text());
-          }
+        }
       );
-      //this.authService.initializeWorkSpace();
     }
 
     private getDismissReason(reason: any): string {

@@ -1,10 +1,18 @@
 <div class="content row" *ngIf="project!==undefined; else elseBlock">
 	<div class="col-md-9 mini-wrapper">
 		<div class="section">
-			<h3 class="title"><b><img src="assets/img/project.png" height="16" class="logo"> &nbsp;{{ project.title }}</b></h3>
+			<h3 class="title">
+				<b><img src="assets/img/project.png" height="16" class="logo"> &nbsp;{{ project.title }}</b>
+				<span class="pull-right" *ngIf="project.study != null">
+					<a class="btn btn-sm btn-primary" target="_blank" [attr.href]="server + project.study"> <i class="fa fa-external-link"></i>&nbsp;{{ project.study }}</a>
+				</span>
+			</h3>
 		</div>
 		<div class="section npt">
 			<div *ngIf="files.length > 0 && !processing else noFilesBlock">
+				<div *ngIf="uploadInprogress"  class="alert alert-danger alert-custom">
+					<strong>File(s) upload in progress!</strong>
+				</div>
 				<tree-view [directory]="projectStructure"></tree-view>
 			</div>
 		</div>
@@ -13,10 +21,10 @@
 		<div class="section">
 		  	<small class="text-muted section-title"><i>Import data</i></small>
 		  	<div class="btn-group-sm" role="group" aria-label="...">
-				<button class="btn btn-primary pointer" data-toggle="tooltip" data-placement="bottom" title="Upload files - Aspera web browser client. Note: Files uploaded through Aspera might take some time to appear in the project folder. " (click)="showAsperaWaitingMessage(asperaMessage)">
-		  			<i class="fa fa-upload"></i> Aspera Upload
+				<button class="btn btn-primary pointer" data-toggle="tooltip" data-placement="bottom" title="Import files - Aspera web browser client. Note: Files uploaded through Aspera might take some time to appear in the project folder." (click)="showAsperaWaitingMessage(asperaMessage)">
+		  			<i class="fa fa-download"></i> Import Data
 		  		</button>
-				<button class="btn btn-info pointer" data-toggle="tooltip" data-placement="bottom" title="Upload files - Aspera command line client" (click)="open(content)">
+				<button class="btn btn-info pointer" data-toggle="tooltip" data-placement="bottom" title="Import files - Aspera command line client" (click)="open(content)">
 		  			<i class="fa fa-terminal"></i>
 		  		</button>
 		  		<a class="btn btn-default pointer" data-toggle="tooltip" data-placement="left" title="Need help with setting up Aspera" href="ftp://ftp.ebi.ac.uk/pub/databases/metabolights/documentation/MetaboLights%20Tutorial%20-%20FAQ.pdf" target="_blank">
@@ -67,7 +75,10 @@
 				<button *ngIf="files?.length > 0" class="btn btn-danger btn-sm" (click)="openDeleteConfirmationModal(confirmDeleteFiles)" data-toggle="tooltip" data-placement="bottom" title="Delete file(s)" ><i class="fa fa-trash"></i></button> 
 		  	</span>
 		  	<p class="alert-wrapper" *ngFor="let alert of alerts">
-				<small><ngb-alert [type]="alert.type" (close)="closeAlert(alert)">{{ alert.message }}</ngb-alert></small>
+				<small><ngb-alert [type]="alert.type" (close)="closeAlert(alert)">
+					<span [innerHTML]="alert.message">
+					</span>
+				</ngb-alert></small>
 			</p>
 		</div>
 		<div class="section">
@@ -158,8 +169,7 @@
 					<h6 class="text-center lighter">
 						No files yet! Upload files using aspera? 
 					</h6>
-					<small>Note: Files uploaded through Aspera might take some time to appear in the project folder.</small><br><br>
-					<small class="center"><i><button class="btn btn-sm btn-primary" (click)="asperaUpload()"><i class="fa fa-upload"></i> UPLOAD DATA </button></i></small>
+					<small class="center"><i><button class="btn btn-sm btn-primary" (click)="showAsperaWaitingMessage(asperaMessage)"><i class="fa fa-download"></i> Import Data Now</button></i></small>
 				</div>
 			</div>
 		</div>
@@ -199,7 +209,15 @@
 			</small>
 			<small class="center tiny text-muted">Note: Conversion might take a while depending upon the size of the .mzML files.</small>
 			<br>
-			<button (click)="convertMzml2isa()" type="submit" class="btn btn-success">Convert .mzML to ISA</button>
+			<div>
+				<button type="button" class="btn btn-secondary" (click)="c('Close click')">Cancel</button>&nbsp;
+				<span *ngIf="processing">
+					<button [disabled]="true" (click)="convertMzml2isa()" type="submit" class="btn btn-success"><i class="fa fa-spinner fa-pulse fa-fw"></i> Convert .mzML to ISA</button>
+				</span>
+				<span *ngIf="!processing">
+					<button (click)="convertMzml2isa()" type="submit" class="btn btn-success">Convert .mzML to ISA</button>
+				</span>
+			</div>
 		</div>
 		<ng-template #warningMZML2ISABlocl>
 			<div class="div-wrapper">
@@ -210,7 +228,15 @@
 				</small>
 				<small class="center tiny text-danger">Note: if you proceed existing ISA tab files will be replaced with new ones; any changes will be lost.</small>
 				<br>
-				<button (click)="convertMzml2isa()" type="submit" class="btn btn-success">Convert .mzML to ISA and overwrite</button>
+				<div>
+					<button type="button" class="btn btn-secondary" (click)="c('Close click')">Cancel</button>&nbsp;
+					<span *ngIf="processing">
+						<button [disabled]="true" (click)="convertMzml2isa()" type="submit" class="btn btn-success"><i class="fa fa-spinner fa-pulse fa-fw"></i> Convert .mzML to ISA</button>
+					</span>
+					<span *ngIf="!processing">
+						<button (click)="convertMzml2isa()" type="submit" class="btn btn-success">Convert .mzML to ISA</button>
+					</span>
+				</div>
 			</div>
 		</ng-template>
 	</div>
@@ -225,7 +251,15 @@
 			</small>
 			<small class="center tiny text-muted">Note: Conversion might take a while depending upon the size of the .nmrML files.</small>
 			<br>
-			<button (click)="convertNmrml2isa()" type="submit" class="btn btn-success">Convert .nrmML to ISA</button>
+			<div>
+				<button type="button" class="btn btn-secondary" (click)="c('Close click')">Cancel</button>&nbsp;
+				<span *ngIf="processing">
+					<button [disabled]="true" (click)="convertNmrml2isa()" type="submit" class="btn btn-success"><i class="fa fa-spinner fa-pulse fa-fw"></i> Convert .nrmML to ISA</button>
+				</span>
+				<span *ngIf="!processing">
+					<button (click)="convertNmrml2isa()" type="submit" class="btn btn-success">Convert .nrmML to ISA</button>
+				</span>
+			</div>
 		</div>
 		<ng-template #warningNMRML2ISABlocl>
 			<div class="div-wrapper">
@@ -236,7 +270,15 @@
 				</small>
 				<small class="center tiny text-danger">Note: if you proceed existing ISA tab files will be replaced with new ones; any changes will be lost.</small>
 				<br>
-				<button (click)="convertNmrml2isa()" type="submit" class="btn btn-success">Convert .nrmML to ISA and overwrite</button>
+				<div>
+					<button type="button" class="btn btn-secondary" (click)="c('Close click')">Cancel</button>&nbsp;
+					<span *ngIf="processing">
+						<button [disabled]="true" (click)="convertNmrml2isa()" type="submit" class="btn btn-success"><i class="fa fa-spinner fa-pulse fa-fw"></i> Convert .nrmML to ISA</button>
+					</span>
+					<span *ngIf="!processing">
+						<button (click)="convertNmrml2isa()" type="submit" class="btn btn-success">Convert .nrmML to ISA</button>
+					</span>
+				</div>
 			</div>
 		</ng-template>
 	</div>
@@ -250,7 +292,15 @@
 				<b>Upon submission, you study will be updated, and you can use the MetaboLights online study editor for any further study updates. Thanks.</b>
 			</small>
 			<br>
-			<button (click)="submitProjectAsStudy()" type="submit" class="btn btn-success">Agree and update study</button>
+			<div>
+				<button type="button" class="btn btn-secondary" (click)="c('Close click')">Cancel</button>&nbsp;
+				<span *ngIf="processing">
+					<button [disabled]="true" (click)="submitProjectAsStudy()" type="submit" class="btn btn-success"><i class="fa fa-spinner fa-pulse fa-fw"></i> Agree and update study</button>
+				</span>
+				<span *ngIf="!processing">
+					<button (click)="submitProjectAsStudy()" type="submit" class="btn btn-success">Agree and update study</button>
+				</span>
+			</div>
 		</div>
 		<div *ngIf="project.study == null" class="div-wrapper">
 			<img src="assets/img/submit-as-study.png" height="128" class="logo"><br>
@@ -259,7 +309,15 @@
 				<b>Upon submission, a MetaboLights Study Identifier will be assigned to the project, and you can use the MetaboLights online study editor for any further study updates. Thanks.</b>
 			</small>
 			<br>
-			<button (click)="submitProjectAsStudy()" type="submit" class="btn btn-success">Agree and proceed</button>
+			<div>
+				<button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>&nbsp;
+				<span *ngIf="processing">
+					<button [disabled]="true" (click)="submitProjectAsStudy()" type="submit" class="btn btn-success"><i class="fa fa-spinner fa-pulse fa-fw"></i> Agree and proceed</button>
+				</span>
+				<span *ngIf="!processing">
+					<button (click)="submitProjectAsStudy()" type="submit" class="btn btn-success">Agree and proceed</button>
+				</span>
+			</div>
 		</div>
 	</div>
 </ng-template>
@@ -276,7 +334,7 @@
 			<a class="pointer" (click)="displayJobLogs(job)"><span class="badge badge-primary">
 		    	<i class="fa fa-eye"></i>&nbsp;View Job Output
 		    </span></a>
-		    <a class="pointer float-right" *ngIf="job.status != 'DONE'" (click)="convertMzml2isa(job)"><span class="badge badge-primary">
+		    <a class="pointer float-right" *ngIf="job.status != 'DONE'" (click)="getJobStatus(job)"><span class="badge badge-primary">
 		    	<i class="fa fa-refresh"></i>&nbsp;Update Status
 		    </span></a>
 			<div class="collapse logFileData" [id]="'job_'+ job.jobId">
@@ -358,8 +416,14 @@
 					Please wait while we assign MetaboLights Study Id to your project. 
 				</h5>
 				<small class="center">This might take a while depending upon the size of the study.</small>
+
 			</div>
 		</div>
+	</div>
+	<div class="modal-footer  jcc">
+		<a routerLink="/workspace/dashboard" class="list-group-item" (click)="c('Close click')" routerLinkActive="router-link-active">
+            <i class="fa fa-fw fa-dashboard"></i>&nbsp;Dashboard
+        </a>
 	</div>
 </ng-template>
 <ng-template #asperaMessage let-c="close" let-d="dismiss" ngbModalContainer>
@@ -376,6 +440,7 @@
 		</div>
 	</div>
 	<div class="modal-footer  jcc">
+		<button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
 		<button class="btn btn-success" (click)="asperaUpload()">Sure! Proceed</button>
 	</div>
 </ng-template>

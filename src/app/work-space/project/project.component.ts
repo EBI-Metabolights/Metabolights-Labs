@@ -26,8 +26,9 @@ export class ProjectComponent implements OnInit {
   @ViewChild('projectLocked') projectLocked: ElementRef;
   @ViewChild('projectStudyLocked') projectStudyLocked: ElementRef;
 
+  server: string = "";
   processing: boolean = false;
-
+  uploadInprogress: boolean = false;
   project: Project;
   id: string;
   projectIndex: any;
@@ -241,7 +242,7 @@ export class ProjectComponent implements OnInit {
               this.alerts.push({
                 id: 1,
                 type: 'success',
-                message: 'Files exported to galaxy successfully <a target="_blank" href="' + this.selectedGalaxyInstance.url + 'history/view_multiple">view in galaxy</a',
+                message: 'Files exported to galaxy successfully <br><a target="_blank" href="' + this.selectedGalaxyInstance.url + 'history/view_multiple">view in galaxy</a',
               });
             }
             this.exportToGalaxyModalRef.close();
@@ -267,6 +268,7 @@ export class ProjectComponent implements OnInit {
         break;
       }
     }
+    this.server = LabsURL['domain'];
     if (this.project!==undefined && this.project.isBusy){
       this.openLoadingProjectModal(this.projectStudyLocked);
       this.getProjectDetails();
@@ -363,9 +365,9 @@ export class ProjectComponent implements OnInit {
     var asperaSettings = JSON.parse(this.project.asperaSettings);
     params["remote_user"] = asperaSettings.asperaUser;
     params["remote_password"] = asperaSettings.asperaSecret;
-    params['remote_host'] = asperaSettings.asperaServer;
+    params['remote_host'] = "hx-fasp-1.ebi.ac.uk" //asperaSettings.asperaServer;
     
-    params['fasp_port'] = 33001;
+    // params['fasp_port'] = 33001;
     params['target_rate_kbps'] = 45000;
     params['min_rate_kbps'] = 0;
     params['lock_policy'] = false;
@@ -374,7 +376,7 @@ export class ProjectComponent implements OnInit {
     params['lock_min_rate'] = false;
     params['rate_policy'] = "fair";
     params['cipher'] = "aes-128";
-    params['ssh_port'] = 22;
+    params['ssh_port'] = 33001;
 
     transferSpecs[0]["transfer_spec"] = params;
 
@@ -415,11 +417,18 @@ export class ProjectComponent implements OnInit {
       (response) => {
         let updatedProject = new Project().deserialize(JSON.parse(response.json().content));;
         if (updatedProject.isBusy){
-          setTimeout(() => { this.getProjectDetails(); }, 10000);
+          setTimeout(() => { this.getProjectDetails(); }, 5000);
         }else{
+
           this.authService.dashBoard.projects[this.projectIndex] = updatedProject;
           this.project = updatedProject;
-          this.loadingModalRef.close();
+          
+          if(this.loadingProjectModalRef){
+            this.loadingProjectModalRef.close();
+          }
+          if(this.loadingModalRef){
+            this.loadingModalRef.close();
+          }
           this.alerts.push({
             id: 1,
             type: 'success',
@@ -496,7 +505,9 @@ export class ProjectComponent implements OnInit {
     });
   }
 
-  submitProjectAsStudy(){
+  submitProjectAsStudy(isUpdate){
+
+    this.processing = true;
 
     let body = {
       "jwt" : localStorage.getItem("jwt"),
@@ -507,22 +518,24 @@ export class ProjectComponent implements OnInit {
     this.http.post(LabsURL['submitProject'], body, { headers: contentHeaders })
     .subscribe(
       (response) => {
-         if(this.submitAsStudyModalRef != undefined){
-           this.submitAsStudyModalRef.close();
-         }
-         let respJob = JSON.parse(response.json().content);
-         let projectJob = new Job().deserialize(respJob);
-         
-         this.alerts.push({
-            id: this.alerts.length + 1,
-            type: 'success',
-            message: 'Job Satus: '+ projectJob.status +' | ID: ' + projectJob.jobId ,
-         });
+           this.processing = false;
+           if(this.submitAsStudyModalRef != undefined){
+             this.submitAsStudyModalRef.close();
+           }
+           let respJob = JSON.parse(response.json().content);
+           let projectJob = new Job().deserialize(respJob);
+           
+           this.alerts.push({
+              id: this.alerts.length + 1,
+              type: 'success',
+              message: 'Job Satus: '+ projectJob.status +' | ID: ' + projectJob.jobId ,
+           });
 
-         this.openLoadingProjectModal(this.projectStudyLocked);
-         this.project.isBusy = true;
+           this.openLoadingProjectModal(this.projectStudyLocked);
+           this.project.isBusy = true;
       },
       error => {
+        this.processing = false;
         console.log(error.text());
       }
     );
@@ -555,7 +568,17 @@ export class ProjectComponent implements OnInit {
     }
   }
 
+  getJobStatus(job: Job){
+    if(this.mzMLFiles.length > 0){
+      this.convertMzml2isa(job);
+    }else{
+      this.convertNmrml2isa(job);
+    }
+  }
+
   convertNmrml2isa(job: Job){
+
+    this.processing = true;
 
     let body = {
       "jwt" : localStorage.getItem("jwt"),
@@ -570,6 +593,7 @@ export class ProjectComponent implements OnInit {
     this.http.post(LabsURL['convertNMRMLToISA'], body, { headers: contentHeaders })
     .subscribe(
       (response) => {
+         this.processing = false;
          if(this.nmrml2isaModalRef != undefined){
            this.nmrml2isaModalRef.close();
          }
@@ -591,8 +615,10 @@ export class ProjectComponent implements OnInit {
            job.status = projectJob.status;
            job = projectJob;
          }
+         this.getProjectContent(this.id);
       },
       error => {
+        this.processing = false;
         console.log(error.text());
       }
     );
@@ -600,6 +626,8 @@ export class ProjectComponent implements OnInit {
   }
 
   convertMzml2isa(job: Job){
+
+    this.processing = true;
 
     let body = {
       "jwt" : localStorage.getItem("jwt"),
@@ -615,6 +643,7 @@ export class ProjectComponent implements OnInit {
     this.http.post(LabsURL['convertMZMLToISA'], body, { headers: contentHeaders })
     .subscribe(
       (response) => {
+          this.processing = false;
          if(this.mzml2isaModalRef != undefined){
            this.mzml2isaModalRef.close();
          }
@@ -636,8 +665,10 @@ export class ProjectComponent implements OnInit {
            job.status = projectJob.status;
            job = projectJob;
          }
+         this.getProjectContent(this.id);
       },
       error => {
+        this.processing = false;
         console.log(error.text());
       }
     );
@@ -674,6 +705,10 @@ export class ProjectComponent implements OnInit {
 
           if(file.indexOf(".nmrML") > -1 || file.indexOf(".nmrml") > -1){
              this.nmrMLFiles.push(file);
+          }
+
+          if(file.indexOf(".aspx") > -1){
+            this.uploadInprogress = true;
           }
         }
         this.renderRichFileStructure();
