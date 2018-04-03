@@ -1,10 +1,10 @@
 var environment = "dev";
-var domain = "http://localhost:8080/metabolights/";
+var domain = "//localhost:8080/metabolights/";
 
 if (environment == "prod"){
-	domain = "https://www.ebi.ac.uk/metabolights/";
+	domain = "//www.ebi.ac.uk/metabolights/";
 }else if (environment == "dev"){
-	domain = "http://wwwdev.ebi.ac.uk/metabolights/";
+	domain = "//wwwdev.ebi.ac.uk/metabolights/";
 }
 
 export const LabsURL 			= {};
