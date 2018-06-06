@@ -86,10 +86,10 @@ export class ProjectComponent implements OnInit {
   }
 
   initForms(){
-      this.editProjectDetailsForm = this.fb.group({
-        'title'         : [this.project.title , Validators.required],
-        'description'   : this.project.description
-      });
+    this.editProjectDetailsForm = this.fb.group({
+      'title'         : [this.project.title , Validators.required],
+      'description'   : this.project.description
+    });
   }
 
   updateSelectedFilesList(e, index, filename){
@@ -258,6 +258,7 @@ export class ProjectComponent implements OnInit {
   	this.route.params.forEach((params: Params) => {
       this.id = params['id'];
     });
+    console.log(this.id)
     this.files = [];
     for(let i in this.authService.dashBoard.projects){
     	if (this.authService.dashBoard.projects[i].id == this.id){

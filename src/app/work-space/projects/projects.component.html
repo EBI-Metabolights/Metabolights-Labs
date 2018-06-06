@@ -159,11 +159,56 @@
 					<small><label for="projectTitle">Description (Optional)</label></small>
 					<textarea rows="5" class="form-control" [formControl]="createProjectForm.controls['description']"></textarea>
 				</div>
-				<div class="form-group" [ngClass]="{'has-error':!createProjectForm.controls['cloneProject'].valid}">
+				<div [ngClass]="{'has-error':!createProjectForm.controls['advancedSettings'].valid}">
 					<div class="checkbox">
-						<small><label><input #someCheckbox type="checkbox" [formControl]="createProjectForm.controls['cloneProject']">&nbsp;Clone existing <a href="http://www.metabolights.org" target="_blank">Metabolights study</a></label></small>
+						<small><label><input type="checkbox" value="true" [formControl]="createProjectForm.controls['advancedSettings']">&nbsp;Advanced Settings</label></small>
 					</div>
-					<input [formControl]="createProjectForm.controls['studyId']" class="form-control" [attr.disabled]="createProjectForm.controls['cloneProject'].value === false || null" type="text" placeholder="Study Id. Ex: MTBLS1">
+				</div>
+				<div class="form-group" *ngIf="createProjectForm.controls['advancedSettings'].value === true">
+					<div class="panel panel-default">
+						<div class="panel-body">
+							<div class="row">
+								<div class="col-lg-6">
+									<small class="text-muted"><a>Select configuration</a></small>
+									<div class="radio">
+									  <label>
+									    <input [formControl]="createProjectForm.controls['cloneType']" type="radio" name="cloneType" value="2">
+									    LCMS
+									  </label>
+									</div>
+									<div class="radio">
+									  <label>
+									    <input [formControl]="createProjectForm.controls['cloneType']" type="radio" name="cloneType" value="3">
+									    GCMS
+									  </label>
+									</div>
+									<div class="radio disabled">
+									  <label>
+									    <input [formControl]="createProjectForm.controls['cloneType']" type="radio" name="cloneType" value="4">
+									    NMR
+									  </label>
+									</div>
+									<div class="radio disabled">
+									  <label>
+									    <input [formControl]="createProjectForm.controls['cloneType']" type="radio" name="cloneType" value="5">
+									    Metabolon Study
+									  </label>
+									</div>
+									<span>
+										<label>
+											<small class="text-muted">OR Clone public <a href="http://www.metabolights.org" target="_blank">Metabolights study</a></small><br>
+											<div class="input-group">
+										      <span class="input-group-addon">
+										        <input value="1" type="radio" name="cloneType" [formControl]="createProjectForm.controls['cloneType']">
+										      </span>
+										      <input [formControl]="createProjectForm.controls['studyId']" class="form-control" [attr.disabled]="createProjectForm.controls['cloneType'].value != 1 || null" type="text" placeholder="Ex: MTBLS1">
+										    </div>
+										</label>
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 			<div class="modal-footer">

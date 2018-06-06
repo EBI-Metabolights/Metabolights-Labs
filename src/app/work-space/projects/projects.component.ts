@@ -25,6 +25,8 @@ export class ProjectsComponent implements OnInit {
     deleteConfirmationModalRef: NgbModalRef;
     waitingModalRef: NgbModalRef;
     cloningProject: Boolean = false;
+    advancedSettings: Boolean = false;
+
     
     @Input()
     public alerts: Array<IAlert> = [];
@@ -37,8 +39,9 @@ export class ProjectsComponent implements OnInit {
       this.createProjectForm = this.fb.group({
         'title'         : ["", Validators.required],
         'description'   : "",
-        'cloneProject'  : false,
-        'studyId'       : ""
+        'cloneType'     : 0,
+        'studyId'       : "",
+        'advancedSettings' : false
       });
     }
 
@@ -49,6 +52,7 @@ export class ProjectsComponent implements OnInit {
 
   	ngOnInit() {
   		this.projects = this.authService.dashBoard.projects;
+      // console.log(this.projects)
       this.selectedProject = this.projects[0];
   	}
 
@@ -129,37 +133,41 @@ export class ProjectsComponent implements OnInit {
 
       this.waitingModalRef = this.modalService.open(waiting, { backdrop : "static" });
 
-      if(body.cloneProject == true){
-        if (body.studyId == "" || body.studyId == null ){
-           alert('Please provide a valid MetaboLights Study ID');
-           this.waitingModalRef.close(); 
-           return;
-        }else{
-          let studies: string[]; 
-          this.http.get(LabsURL['studiesList'], { headers: contentHeaders })
-          .subscribe(
-            (response) => {
-              studies = response.json().content
-              let studyExists = false;
-                studies.forEach( study => {
-                   if ( study === body.studyId.toUpperCase() ){
-                     studyExists = true;
-                   }
-                })
+      if(body.advancedSettings == true){
+        if(body.cloneType == 1){
+          if (body.studyId == "" || body.studyId == null ){
+             alert('Please provide a valid MetaboLights Study ID');
+             this.waitingModalRef.close(); 
+             return;
+          }else{
+            let studies: string[]; 
+            this.http.get(LabsURL['studiesList'], { headers: contentHeaders })
+            .subscribe(
+              (response) => {
+                studies = response.json().content
+                let studyExists = false;
+                  studies.forEach( study => {
+                     if ( study === body.studyId.toUpperCase() ){
+                       studyExists = true;
+                     }
+                  })
 
-                if (studyExists){
-                  this.cloningProject = true;
-                  this.submitCreateRequest(body);
-                }else{
-                  alert("Invalid study identifier. Note: Cloning is currently supported only for public studies")
-                  this.waitingModalRef.close(); 
-                  return;
+                  if (studyExists){
+                    this.cloningProject = true;
+                    this.submitCreateRequest(body);
+                  }else{
+                    alert("Invalid study identifier. Note: Cloning is currently supported only for public studies")
+                    this.waitingModalRef.close(); 
+                    return;
+                }
+              },
+              error => {
+                console.log(error);    
               }
-            },
-            error => {
-              console.log(error);    
-            }
-          );
+            );
+          }
+        }else{
+          this.submitCreateRequest(body);
         }
       }else{
         this.submitCreateRequest(body);
