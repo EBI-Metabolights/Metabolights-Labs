@@ -2,9 +2,9 @@ var environment = "dev";
 var domain = "//localhost:8080/metabolights/";
 
 if (environment == "prod"){
-	domain = "//www.ebi.ac.uk/metabolights/";
+	domain = "https://www.ebi.ac.uk/metabolights/";
 }else if (environment == "dev"){
-	domain = "//wwwdev.ebi.ac.uk/metabolights/";
+	domain = "https://wwwdev.ebi.ac.uk/metabolights/";
 }
 
 export const LabsURL 			= {};

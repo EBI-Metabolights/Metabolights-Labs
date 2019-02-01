@@ -54,7 +54,7 @@
 							</span>
 						</h3>
 						<br>
-						<div *ngIf="settings.galaxy == undefined || galaxyInstances.length == 0;else instancesExist" class="text-center">
+						<div *ngIf="(settings['galaxy'] == undefined) || galaxyInstances.length == 0;else instancesExist" class="text-center">
 							<small class="text-muted">
 								Get started now with workflows. Add your Galaxy instance <span class="text-primary" (click)="openGalaxyModal(addGalaxyInstance)">here</span>
 							</small>
